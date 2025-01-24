@@ -26,7 +26,7 @@ logger.addHandler(handler)
 
 
 # unit code(법정 동코드)
-unit_code_filepath = "/Users/junwkim/workspace/poc/naver_realestate/법정동코드 전체자료.txt"
+unit_code_filepath = "./unit_code_list.txt"
 unit_code_table = pd.read_csv(unit_code_filepath, encoding='cp949', sep="\t")
 unit_code_table.columns = ["code", "name", "status"]
 unit_code_table = unit_code_table[unit_code_table.status == "존재"]
