@@ -1,3 +1,13 @@
+import google.generativeai as genai
+
+def get_gemini(model_name: str = "gemini-1.5-flash-8b"):
+    API_KEY = open("/Users/junwkim/workspace/official/personal_info/gemini_api.txt").read().split("\n")[1]
+    genai.configure(api_key=API_KEY)
+    model = genai.GenerativeModel(
+        model_name,
+    )
+    return model
+
 cookies = {
     'NNB': '7IYBCUPJFBYGI',
     'ASID': 'de6c3e080000018a44fc234e0000005e',
@@ -40,3 +50,4 @@ headers = {
     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
     'x-requested-with': 'XMLHttpRequest',
 }
+

@@ -38,4 +38,3 @@ for idx, article_no in tqdm(enumerate(article_nos)):
 
 with open("./article_details.pkl","wb") as f:
     pickle.dump(article_detail_list, f)
-
