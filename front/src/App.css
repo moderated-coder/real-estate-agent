@@ -1,0 +1,109 @@
+.main-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.search-bar {
+  display: flex;
+  padding: 8px 8px 0 0;
+  z-index: 3;
+  position: relative;
+  min-height: 44px;
+  border: 1px solid transparent;
+  background: #fff;
+  box-shadow: 0px 2px 8px 0px rgba(60, 64, 67, 0.25);
+  border-radius: 24px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+.home-bar {
+  max-width: 600px;
+}
+.search-bar > img {
+  margin: 10px;
+}
+.search-bar > form {
+  display: flex;
+  width: 100%;
+}
+.textarea-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.icon-warpper {
+  display: flex;
+  align-items: center;
+  padding-right: 13px;
+  padding-left: 14px;
+  height: 46px;
+}
+.search-textarea {
+  flex: 100%;
+  font-family: Arial, Apple SD Gothic Neo, sans-serif;
+  line-height: 22px;
+  font-size: 16px;
+  border-bottom: 8px solid transparent;
+
+  overflow: hidden;
+  resize: none;
+  background-color: transparent;
+  border: none;
+  margin: 0;
+  white-space: pre-line;
+  color: rgba(0, 0, 0, 0.87);
+  word-wrap: break-word;
+  outline: none;
+  display: flex;
+  height: 35px;
+  -webkit-tap-highlight-color: transparent;
+}
+.search-bar input {
+  resize: none;
+  background-color: transparent;
+  border: none;
+  margin: 0;
+  padding: 0 0 3px;
+  color: rgba(0, 0, 0, 0.87);
+  word-wrap: break-word;
+  outline: none;
+  font: 16px arial, sans-serif;
+  line-height: 34px;
+  font-size: 16px;
+  flex: 100%;
+  line-height: 39px;
+}
+.line {
+  border-left: 1px solid #dadce0;
+  height: 65%;
+}
+.search-bar span {
+  display: inline-block;
+
+  color: #4285f4;
+  fill: #4285f4; /* 이미지 색상을 바꿔줌 */
+  height: 24px;
+  line-height: 24px;
+  position: relative;
+  width: 24px;
+}
+
+/* search 필터 */
+.tag-list-scrolling {
+  padding-top: 30px;
+  overflow: hidden;
+}
+.tag-list-wrapper {
+  padding-right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+}
+.tag-list-wrapper {
+  --button-color: #171719;
+  color: var(--button-color);
+  background-color: #fff;
+}
