@@ -5,10 +5,12 @@ import CancelIcon from "@/assets/cancel.svg?react";
 
 const Search = () => {
   const [whitSpace, setWhitSpace] = useState<string>("normal");
+  const [colors, setColors] = useState<boolean[]>(Array(10).fill(false));
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const searchBarRef = useRef<HTMLDivElement>(null);
   const tagListRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
+  const isMoving = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
 
@@ -39,26 +41,29 @@ const Search = () => {
     event.preventDefault();
     event.stopPropagation();
     isDragging.current = true;
+    isMoving.current = false;
     startX.current = event.clientX;
     scrollLeft.current = tagListRef.current?.scrollLeft || 0;
     document.body.style.cursor = "grabbing";
-    console.log("down", scrollLeft);
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging.current || !tagListRef.current) return;
+    isMoving.current = true;
     event.preventDefault();
     event.stopPropagation();
     const x = event.clientX;
     const walk = x - startX.current;
     tagListRef.current.scrollLeft = scrollLeft.current - walk;
-    console.log("move", tagListRef.current.scrollLeft);
   };
 
   const handleMouseUp = () => {
     isDragging.current = false;
     document.body.style.cursor = "default";
-    console.log("up", scrollLeft);
+
+    setTimeout(() => {
+      isMoving.current = false;
+    }, 10);
   };
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
@@ -77,6 +82,12 @@ const Search = () => {
 
   const handleTouchEnd = () => {
     isDragging.current = false;
+  };
+
+  const clickFilter = (index: number) => {
+    if (!isMoving.current) {
+      setColors((prevColor) => prevColor.map((color, i) => (i == index ? !color : color)));
+    }
   };
 
   return (
@@ -120,7 +131,12 @@ const Search = () => {
           onTouchEnd={handleTouchEnd} // 터치 종료
         >
           {Array.from({ length: 10 }, (_, i) => (
-            <li key={i} className="tag-list">
+            <li
+              key={i}
+              className="tag-list"
+              onClick={() => clickFilter(i)}
+              style={{ backgroundColor: colors[i] ? "black" : "white", color: colors[i] ? "white" : "black" }}
+            >
               필터 {i + 1}
             </li>
           ))}
