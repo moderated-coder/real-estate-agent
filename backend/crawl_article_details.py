@@ -1,12 +1,16 @@
 import logging
 import requests
 import pickle
+import time
+import random
 
 import pandas as pd
 from tqdm import tqdm
 from fake_useragent import UserAgent
 
-from utils import cookies, headers
+from utils import cookies, headers, extract_total_data_from_html
+import google.generativeai as genai
+from utils import get_gemini
 
 
 # job name
@@ -22,19 +26,25 @@ logger.addHandler(handler)
 
 
 # load article table
-df = pd.read_csv("./구로동_article.csv")
+df = pd.read_csv("./data/구로동_article.csv")
 logger.warning(f"sample article row: \n{df.sample(1).to_dict('records')}")
 
 # request article details
 url = "https://fin.land.naver.com/articles/"
+logger.warning(f"default article detail page: {url}")
+
 
 article_detail_list = list()
 article_nos = df.atclNo.values.tolist()
+
 for idx, article_no in tqdm(enumerate(article_nos)):
-    endpoint_url = url + str(article_no)
-    response = requests.get(endpoint_url, cookies=cookies, headers=headers)
-    article_detail_list.append(response.text)
+    try:
+        endpoint_url = url + str(article_no)
+        article_detail_response = requests.get(endpoint_url, cookies=cookies, headers=headers).text
+        parsed_response = extract_total_data_from_html(article_detail_response)
+        article_detail_list.append(parsed_response)
+    except Exception as e:
+        logger.warning(f"error: {e}")
 
-
-with open("./article_details.pkl","wb") as f:
-    pickle.dump(article_detail_list, f)
+df["article_details"] = article_detail_list
+df.to_csv("./data/구로동_parsed_article.csv")

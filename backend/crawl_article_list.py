@@ -26,7 +26,7 @@ logger.addHandler(handler)
 
 
 # unit code(법정 동코드)
-unit_code_filepath = "./unit_code_list.txt"
+unit_code_filepath = "./data/unit_code_list.txt"
 unit_code_table = pd.read_csv(unit_code_filepath, encoding='cp949', sep="\t")
 unit_code_table.columns = ["code", "name", "status"]
 unit_code_table = unit_code_table[unit_code_table.status == "존재"]
@@ -36,7 +36,7 @@ logger.warning(f"법정동코드 예시: \n{unit_code_table.sample(1).to_dict('r
 #  동정보
 target_unit = "구로동"
 target_unit_info = unit_code_table[unit_code_table.name.str.contains(target_unit)]
-logger.warning(f"검색 대상 동: \n{target_unit}")
+logger.warning(f"검색 대상 동: {target_unit}")
 
 target_unit_code = target_unit_info.code.tolist()[0]
 logger.warning(f"대상 code: {target_unit_code}")
@@ -82,7 +82,7 @@ for area in tqdm(area_articles):
         print(e)
 
 article_df = pd.DataFrame.from_dict(article_list)
-article_df.to_csv(f"./{target_unit}_article.csv")
+article_df.to_csv(f"./data/{target_unit}_article.csv")
 logger.warning(f"num of {target_unit}'s article: {len(article_list)}")
 logger.warning(f"article dataframe: \n{article_df}")
 
