@@ -10,6 +10,30 @@
 ```
 
 
-# Front
-### Application
-- 여기에 설명해주세요.
+# Front - Home Search  
+
+사용자가 처음 접하는 화면으로, 검색 기능을 제공합니다.  
+
+## 기능  
+- **검색어를 입력하여 검색할 수 있는 기능**  
+- **검색 결과에 필터를 적용하는 기능** *(개발 중)*  
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/425ae2aa-7b8d-46f7-b39e-e63c8c70dd78" alt="Home Search 화면">
+</p>
+
+---
+
+# Search  
+
+검색 결과를 표시하는 화면으로, 결과를 카드 형태로 제공합니다.  
+
+## 기능  
+- **검색 기능 제공**  
+- **검색 결과를 카드 형태로 출력**  
+- **썸네일을 클릭하여 검색 상세 페이지로 이동** *(개발 중)*  
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/06729f44-01cb-4ef9-86c5-d68fedc2fbf9" alt="Search 화면">
+</p>
+
