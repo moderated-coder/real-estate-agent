@@ -15,7 +15,7 @@ async function enableMocking() {
   const { worker } = await import("./mocks/browser.ts");
 
   // 가져온 서비스 워커를 브라우저에서 시작해 API 요청을 가로채고, 정의된 핸들러로 응답 반환
-  worker.start();
+  return worker.start();
 }
 
 const rootElement = document.getElementById("root")!;

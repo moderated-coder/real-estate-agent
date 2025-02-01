@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
-
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import SearchIcon from "@/assets/search.svg?react";
 import CancelIcon from "@/assets/cancel.svg?react";
+import { useSearchParams } from "react-router-dom";
 
 const Search = () => {
   const [whitSpace, setWhitSpace] = useState<string>("normal");
@@ -13,7 +14,55 @@ const Search = () => {
   const isMoving = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q");
+  interface RealEstateItem {
+    article_price: string;
+    article_short_features: string[];
+    article_title: string;
+    공급면적: string;
+    전용면적: string;
+    층: string;
+    향: string;
+    "방/욕실": string;
+    복층여부: string;
+    입주가능일: string;
+  }
+  interface RealEstateResponse {
+    results: RealEstateItem[]; // 여기에 실제 데이터 타입을 명시하면 더 좋습니다!
+    message?: string;
+    error?: string;
+  }
+  const getRealEstateListings = async (query: string): Promise<RealEstateResponse | null> => {
+    try {
+      console.log(query);
+      const params = new URLSearchParams({ q: query });
+      console.log(decodeURIComponent(params.toString()));
+      const response = await fetch(`/search/realestate?${decodeURIComponent(params.toString())}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
 
+      if (!response.ok) {
+        // HTTP 상태 코드가 200이 아닌 경우
+        const errorData = await response.json();
+        throw new Error(errorData?.message || "Failed to fetch real estate listings");
+      }
+
+      const json = await response.json();
+      return json;
+    } catch (error) {
+      console.error("Error fetching real estate listings:", error);
+      return null;
+    }
+  };
+  const { status, data: realEstateResults } = useQuery({
+    queryKey: ["search", query],
+    queryFn: () => getRealEstateListings(query!),
+    enabled: !!query, // query가 존재할 때만 실행
+    retry: 10,
+  });
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("mousedown", calTextareaHeight);
@@ -89,7 +138,42 @@ const Search = () => {
       setColors((prevColor) => prevColor.map((color, i) => (i == index ? !color : color)));
     }
   };
+  const renderdContent = useMemo(() => {
+    if (status === "pending") {
+      return <span>Loading...</span>;
+    }
 
+    if (status === "error") {
+      return <span>Error</span>;
+    }
+    console.log(realEstateResults);
+    if (status === "success" && realEstateResults?.results?.length) {
+      return (
+        <div className="real-estate-container">
+          {realEstateResults.results.map((realEstateResult, index) => (
+            <div className="real-estate-card" key={index}>
+              <img
+                src="/image/sampleRoom.jpg" /* 실제 이미지 URL로 변경 */
+                alt={realEstateResult.article_title}
+                className="real-estate-thumbnail"
+              />
+              <div className="real-estate-content">
+                <h3 className="real-estate-title">{realEstateResult.article_title}</h3>
+                <p className="real-estate-price">{realEstateResult.article_price.toLocaleString()} KRW</p>
+                <div className="real-estate-features">
+                  {realEstateResult.article_short_features.map((feature: string) => (
+                    <p key={feature}>{feature}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    return null; // 데이터가 없을 경우 null 반환
+  }, [status, realEstateResults]); // `status`와 `realEstateResults`가 변경될 때만 재계산됨
   return (
     <>
       <div ref={searchBarRef} className="search-bar">
@@ -142,6 +226,7 @@ const Search = () => {
           ))}
         </div>
       </div>
+      <div>{renderdContent}</div>
     </>
   );
 };
