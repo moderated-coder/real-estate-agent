@@ -3,7 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import SearchIcon from "@/assets/search.svg?react";
 import CancelIcon from "@/assets/cancel.svg?react";
 import { useSearchParams } from "react-router-dom";
-
+interface FilterQuery {
+  filter1: Boolean;
+  filter2: Boolean;
+  filter3: Boolean;
+  filter4: Boolean;
+  filter5: Boolean;
+  filter6: Boolean;
+  filter7: Boolean;
+  filter8: Boolean;
+  filter9: Boolean;
+  filter10: Boolean;
+}
 const Search = () => {
   const [whitSpace, setWhitSpace] = useState<string>("normal");
   const [colors, setColors] = useState<boolean[]>(Array(10).fill(false));
@@ -16,6 +27,18 @@ const Search = () => {
   const scrollLeft = useRef(0);
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q");
+  const [filterQuery, setFilterQuery] = useState<FilterQuery>({
+    filter1: true,
+    filter2: true,
+    filter3: false,
+    filter4: false,
+    filter5: false,
+    filter6: false,
+    filter7: false,
+    filter8: false,
+    filter9: false,
+    filter10: false,
+  });
   interface RealEstateItem {
     article_price: string;
     article_short_features: string[];
@@ -136,7 +159,13 @@ const Search = () => {
   const clickFilter = (index: number) => {
     if (!isMoving.current) {
       setColors((prevColor) => prevColor.map((color, i) => (i == index ? !color : color)));
-    }
+      setFilterQuery((prevFilterQuery: FilterQuery) => {
+        const key = `filter${index + 1}` as keyof FilterQuery;
+        return {
+          ...prevFilterQuery,
+          [key]: !prevFilterQuery[key],
+        };
+      });
   };
   const renderdContent = useMemo(() => {
     if (status === "pending") {
@@ -146,7 +175,7 @@ const Search = () => {
     if (status === "error") {
       return <span>Error</span>;
     }
-    console.log(realEstateResults);
+
     if (status === "success" && realEstateResults?.results?.length) {
       return (
         <div className="real-estate-container">
