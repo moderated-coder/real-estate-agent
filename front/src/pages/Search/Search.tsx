@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import SearchIcon from "@/assets/search.svg?react";
 import CancelIcon from "@/assets/cancel.svg?react";
@@ -16,6 +17,7 @@ interface FilterQuery {
   filter10: Boolean;
 }
 const Search = () => {
+  const navigate = useNavigate();
   const [whitSpace, setWhitSpace] = useState<string>("normal");
   const [colors, setColors] = useState<boolean[]>(Array(10).fill(false));
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -27,9 +29,10 @@ const Search = () => {
   const scrollLeft = useRef(0);
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q");
+  const [searchQuery, setSearchQuery] = useState("");
   const [filterQuery, setFilterQuery] = useState<FilterQuery>({
-    filter1: true,
-    filter2: true,
+    filter1: false,
+    filter2: false,
     filter3: false,
     filter4: false,
     filter5: false,
@@ -56,11 +59,38 @@ const Search = () => {
     message?: string;
     error?: string;
   }
+  // 검색 헨들러
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (e.target.value !== null) {
+      setSearchQuery(e.target.value);
+    }
+  };
+  const handlKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault(); // 엔터 입력 방지
+      handleSearch();
+    }
+  };
+  const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      alert("검색어를 입력해주세요!");
+      return;
+    }
+    const params = new URLSearchParams();
+    params.set("q", searchQuery);
+    Object.entries(filterQuery).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, "true"); // 필터가 true인 경우만 추가
+      }
+    });
+
+    navigate(`/search?${params.toString()}`);
+  };
+
   const getRealEstateListings = async (query: string): Promise<RealEstateResponse | null> => {
     try {
-      console.log(query);
       const params = new URLSearchParams({ q: query });
-      console.log(decodeURIComponent(params.toString()));
+
       const response = await fetch(`/search/realestate?${decodeURIComponent(params.toString())}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -166,6 +196,7 @@ const Search = () => {
           [key]: !prevFilterQuery[key],
         };
       });
+    }
   };
   const renderdContent = useMemo(() => {
     if (status === "pending") {
@@ -203,10 +234,15 @@ const Search = () => {
 
     return null; // 데이터가 없을 경우 null 반환
   }, [status, realEstateResults]); // `status`와 `realEstateResults`가 변경될 때만 재계산됨
+
   return (
     <>
       <div ref={searchBarRef} className="search-bar">
-        <div className="icon-wrpper" style={{ paddingRight: "13px", paddingLeft: "14px" }}>
+        <div
+          className="icon-wrpper"
+          style={{ paddingRight: "13px", paddingLeft: "14px", cursor: "pointer" }}
+          onClick={() => navigate("/")}
+        >
           <img src="/image/logo.svg" />
         </div>
         <form>
@@ -215,6 +251,9 @@ const Search = () => {
               className="search-textarea"
               ref={textareaRef}
               onInput={calTextareaHeight}
+              value={searchQuery}
+              onChange={handleInput}
+              onKeyDown={handlKeyDown}
               rows={1}
               placeholder="Type something here..."
               style={{ whiteSpace: whitSpace }}
@@ -248,7 +287,10 @@ const Search = () => {
               key={i}
               className="tag-list"
               onClick={() => clickFilter(i)}
-              style={{ backgroundColor: colors[i] ? "black" : "white", color: colors[i] ? "white" : "black" }}
+              style={{
+                backgroundColor: filterQuery[`filter${i + 1}` as keyof FilterQuery] ? "black" : "white",
+                color: filterQuery[`filter${i + 1}` as keyof FilterQuery] ? "white" : "black",
+              }}
             >
               필터 {i + 1}
             </li>

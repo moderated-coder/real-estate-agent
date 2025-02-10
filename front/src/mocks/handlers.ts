@@ -5,8 +5,6 @@ export const handlers = [
     const url = new URL(request.url);
     const query = url.searchParams.get("q");
 
-    console.log(query); // "나루토"
-
     return HttpResponse.json({
       results: [
         {

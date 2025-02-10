@@ -51,7 +51,7 @@ const Home = () => {
         params.set(key, "true"); // 필터가 true인 경우만 추가
       }
     });
-    console.log(params.toString());
+
     navigate(`/search?${params.toString()}`);
   };
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
