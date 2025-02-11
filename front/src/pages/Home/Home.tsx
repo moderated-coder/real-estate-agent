@@ -1,9 +1,34 @@
 import SearchIcon from "@/assets/search.svg?react";
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+let url = "/search?q=house&category=apartment&k=ca";
 const Home = () => {
+  interface FilterQuery {
+    filter1: Boolean;
+    filter2: Boolean;
+    filter3: Boolean;
+    filter4: Boolean;
+    filter5: Boolean;
+    filter6: Boolean;
+    filter7: Boolean;
+    filter8: Boolean;
+    filter9: Boolean;
+    filter10: Boolean;
+  }
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [filterQuery, setFilterQuery] = useState<FilterQuery>({
+    filter1: true,
+    filter2: true,
+    filter3: false,
+    filter4: false,
+    filter5: false,
+    filter6: false,
+    filter7: false,
+    filter8: false,
+    filter9: false,
+    filter10: false,
+  });
   const navigate = useNavigate();
   const handleInput = () => {
     if (textareaRef.current) {
@@ -19,8 +44,15 @@ const Home = () => {
       alert("검색어를 입력해주세요!");
       return;
     }
-    console.log(`🔍 검색어: ${searchQuery}`);
-    navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+    const params = new URLSearchParams();
+    params.set("q", searchQuery);
+    Object.entries(filterQuery).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, "true"); // 필터가 true인 경우만 추가
+      }
+    });
+
+    navigate(`/search?${params.toString()}`);
   };
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {

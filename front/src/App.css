@@ -33,6 +33,9 @@
   flex-wrap: wrap;
   flex: 1;
 }
+.textarea-wrapper > form {
+  width: 100%;
+}
 .icon-warpper {
   display: flex;
   align-items: center;
@@ -42,6 +45,7 @@
 }
 .search-textarea {
   flex: 100%;
+  width: 100%;
   font-family: Arial, Apple SD Gothic Neo, sans-serif;
   line-height: 22px;
   font-size: 16px;
