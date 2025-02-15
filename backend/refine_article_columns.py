@@ -85,6 +85,9 @@ target_summary_column_list = {
     "tagList": "tag_list",
     "spc1": "supply_area",
     "spc2": "exclusive_area",
+    "prc": "deposit_fee",
+    "rentPrc": "rent_fee",
+    "repImgUrl": "image_url",
 }
 
 target_refined_column_map = {
