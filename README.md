@@ -9,6 +9,10 @@
 3. refine_article_columns.py: parsing된 컬럼을 유의미하게 refine
 ```
 
+# Front Demo
+- `streamlit run front-demo/streamlit_app.py`
+- 보증금, 월세, 전용면적, 공급면적, 매물타입으로 필터링 조건 생성
+
 
 # Front - Home Search  
 
