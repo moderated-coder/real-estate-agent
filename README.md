@@ -15,7 +15,8 @@
 
 
 # Front - Home Search  
-
+실행 명령어
+- front 폴더에서 `npm install` `npm run start`
 사용자가 처음 접하는 화면으로, 검색 기능을 제공합니다.  
 
 ## 기능  
