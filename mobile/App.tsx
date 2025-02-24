@@ -11,7 +11,15 @@ const App = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <WebView source={{uri: webviewUrl}} style={styles.webview} />
+      <WebView
+        source={{uri: webviewUrl}}
+        style={styles.webview}
+        injectedJavaScript={`
+          document.documentElement.style.webkitTouchCallout='none';
+          document.documentElement.style.webkitUserSelect='none';
+        `}
+        onLoad={() => console.log('WebView Loaded')}
+      />
     </SafeAreaView>
   );
 };
