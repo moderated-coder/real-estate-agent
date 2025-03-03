@@ -1,6 +1,27 @@
 # BackEnd
 
-### Crawling
+
+### backend
+- fastapi, mongo db로 동작하는 서버기능을 구현한다.
+- mongodb 설치
+```
+$ brew tap mongodb/brew
+$ brew install mongodb-community
+$ brew services start mongodb-community
+$ brew install mongodb-community-shell
+$ mongo
+$ use admin
+$ db.createUser({user : "root", pwd : "1234", roles : [ "root" ]})
+```
+
+- 서버실행
+```
+$ cd backend/
+$ python main.py
+```
+- swagger: localhost:8000/docs
+
+### backend_crawl
 - 네이버 부동산 서비스의 웹요청을 mocking하여 데이터를 수집한다.
 - 실행순서는 다음과 같다.
 ```
