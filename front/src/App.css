@@ -1,13 +1,245 @@
+/* iPhone에서 자동 링크 감지 방지 */
+.no-autolink,
+.filter-button {
+  -webkit-touch-callout: none; /* 길게 눌러도 링크 메뉴 안 뜨게 */
+  -webkit-user-select: none; /* 사용자가 선택 못 하게 */
+  user-select: none;
+  color: inherit !important; /* 기본 글씨 색상 유지 */
+  text-decoration: none !important; /* 밑줄 제거 */
+  pointer-events: auto; /* 링크가 아닌 일반 요소로 인식 */
+}
+.no-autolink {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  color: #000 !important; /* 기본 글씨 색상 강제 적용 */
+  text-decoration: none !important; /* 밑줄 제거 */
+}
+a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
 .main-section {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 600px;
+  height: 40px;
+  padding: 0 16px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
+.filter-bar:hover {
+  background-color: #f5f5f5;
+}
+
+/* 검색 바 */
+.search-bar {
+  display: flex;
+  align-items: center;
+  width: 300px;
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 0 12px;
+  margin-top: 16px;
+  background-color: #fff;
+}
+
+.icon-wrapper {
+  margin-right: 8px;
+}
+
+.search-textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+/* 모달 오버레이 */
+.modal-overlay {
+  position: fixed;
+  display: flex;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+
+  justify-content: center;
+  align-items: flex-end;
+}
+
+/* 모달 본체 */
+.modal {
+  width: 100%;
+
+  background: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1rem;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 모달 헤더 */
+.modal-header {
+  display: flex;
+
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  flex-shrink: 0; /* 크기 줄어들지 않도록 고정 */
+}
+
+/* 닫기 버튼 */
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* 필터 리스트 */
+.filter-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1; /* 남는 공간을 차지하도록 설정 */
+  overflow-y: auto; /* 내용이 많아지면 스크롤 */
+  max-height: 67vh; /* 전체 높이의 최대 50%까지만 확장 */
+}
+
+.filter-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+  padding: 12px;
+}
+
+.filter-item:hover {
+  background: #f5f5f5;
+}
+
+.arrow {
+  color: #999;
+  cursor: pointer;
+}
+
+/* 모달 푸터 */
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  flex-shrink: 0; /* 크기 줄어들지 않도록 고정 */
+}
+
+/* 초기화 버튼 */
+.reset-btn {
+  padding: 10px 20px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* 적용 버튼 */
+.apply-btn {
+  padding: 10px 20px;
+  margin: 0px 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  flex: 1;
+}
+.filter-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.filter-button {
+  width: 100%;
+  background: none;
+  border: none;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+}
+
+/*서브 필터 리스트 */
+.sub-filter-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/*체크박스 스타일 */
+.sub-filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+/* 기본 체크박스 숨기기 & 커스텀 체크박스 적용 */
+.sub-filter-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+}
+
+/* 체크된 상태 */
+.sub-filter-item input[type="checkbox"]:checked {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+/* 체크된 상태에서 내부 체크 표시 */
+.sub-filter-item input[type="checkbox"]:checked::after {
+  content: "✔";
+  font-size: 12px;
+  color: white;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+}
+
+/* 체크박스 라벨 */
+.sub-filter-item label {
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+}
 .search-bar {
   display: flex;
   padding: 8px 8px 0 0;
-  z-index: 3;
   position: relative;
   min-height: 44px;
   border: 1px solid transparent;

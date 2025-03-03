@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import SearchIcon from "@/assets/search.svg?react";
 import CancelIcon from "@/assets/cancel.svg?react";
+
 import { useSearchParams } from "react-router-dom";
 interface FilterQuery {
   filter1: Boolean;
@@ -198,7 +199,7 @@ const Search = () => {
       });
     }
   };
-  const renderdContent = useMemo(() => {
+  const renderdContent = () => {
     if (status === "pending") {
       return <span>Loading...</span>;
     }
@@ -233,7 +234,7 @@ const Search = () => {
     }
 
     return null; // 데이터가 없을 경우 null 반환
-  }, [status, realEstateResults]); // `status`와 `realEstateResults`가 변경될 때만 재계산됨
+  }; // `status`와 `realEstateResults`가 변경될 때만 재계산됨
 
   return (
     <>
@@ -297,7 +298,7 @@ const Search = () => {
           ))}
         </div>
       </div>
-      <div>{renderdContent}</div>
+      <div>{renderdContent()}</div>
     </>
   );
 };
