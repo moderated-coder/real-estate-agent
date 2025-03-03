@@ -97,7 +97,6 @@ else:
             if isinstance(row['image_url'], float):
                 image_url = "https://thumbs.dreamstime.com/b/modern-luxury-house-exterior-sunset-warm-interior-lights-lush-green-lawn-343134353.jpg"
             else:
-                print(type(row["image_url"]))
                 image_url = "https://landthumb-phinf.pstatic.net/" + row["image_url"]
             
             card_html = f"""
