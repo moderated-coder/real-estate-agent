@@ -8,7 +8,7 @@ from tqdm import tqdm
 from typing import List, Dict, Any
 
 from utils.crawl_utils import cookies, headers
-from repository.real_estate_db import RealEstateDB
+from repository.mongo_database import MongoDatabase
 
 
 class NaverCrawlerService:
@@ -19,6 +19,10 @@ class NaverCrawlerService:
         self.unit_code_table = self._get_unit_code_table()
         self.cluster_request_url = "https://m.land.naver.com/cluster/clusterList"
         self.article_list_request_url = "https://m.land.naver.com/cluster/ajax/articleList"
+        self.article_detail_request_url = "https://fin.land.naver.com/articles/"
+
+        self.mongo_db = MongoDatabase()
+        self.mongo_db.connect()
 
     def _get_unit_code_table(self) -> pd.DataFrame:
         unit_code_filepath = "../data/unit_code_list.txt"
@@ -47,7 +51,7 @@ class NaverCrawlerService:
             self.logger.warning(f"{dongname} has detected...")
             return {"unit_code": target_unit_code, "status": "success"}
         except Exception as e:
-            return {"unit_code": "", "status": "failed", "error": e}
+            return {"unit_code": "", "status": "fail", "error": e}
 
     def get_article_list_from_unit_code(self, unit_code: str) -> List[str]:
         try:
@@ -92,6 +96,9 @@ class NaverCrawlerService:
 
             # article_df = pd.DataFrame.from_dict(article_list)
             self.logger.warning(article_list[:10])
-            
+
+            self.mongo_db.insert_data(article_list)
+            return {"collection_name": self.mongo_db.collection_name, "status": "success"}
         except Exception as e:
-            self.logger.warning(e)
+            self.logger.error(e)
+            return {"status": "fail"}
