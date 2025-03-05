@@ -5,7 +5,7 @@ import "./App.css";
 
 import Home from "./pages/Home/Home";
 import Search from "./pages/Search/Search";
-
+import Detail from "./pages/Detail/Detail";
 const queryClient = new QueryClient();
 
 function App() {
@@ -14,8 +14,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/search/detail" element={<Detail />} />
       </Routes>
-      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

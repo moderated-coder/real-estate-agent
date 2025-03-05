@@ -1,304 +1,98 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import SearchIcon from "@/assets/search.svg?react";
-import CancelIcon from "@/assets/cancel.svg?react";
-
+import { useRef, useState, useEffect } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
+import { useInView } from "react-intersection-observer";
+import FilterList from "@/pages/components/FilterList";
+import SearchResults from "@/pages/components/SearchResults";
+import SearchBar from "../components/\bSearchBar";
+import FilterModal from "../components/FilterModal";
+import DownArrow from "@/assets/down_arrow.svg?react";
 interface FilterQuery {
-  filter1: Boolean;
-  filter2: Boolean;
-  filter3: Boolean;
-  filter4: Boolean;
-  filter5: Boolean;
-  filter6: Boolean;
-  filter7: Boolean;
-  filter8: Boolean;
-  filter9: Boolean;
-  filter10: Boolean;
+  [key: string]: boolean;
 }
+interface Post {
+  postId: number;
+  article_price: string;
+  article_short_features: string[];
+  article_title: string;
+}
+interface RealEstateResponse {
+  results: Post[];
+}
+
 const Search = () => {
-  const navigate = useNavigate();
-  const [whitSpace, setWhitSpace] = useState<string>("normal");
-  const [colors, setColors] = useState<boolean[]>(Array(10).fill(false));
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const searchBarRef = useRef<HTMLDivElement>(null);
-  const tagListRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
-  const isMoving = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
+  const [isOpen, setIsOpen] = useState(false);
   const [searchParams] = useSearchParams();
-  const query = searchParams.get("q");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterQuery, setFilterQuery] = useState<FilterQuery>({
-    filter1: false,
-    filter2: false,
-    filter3: false,
-    filter4: false,
-    filter5: false,
-    filter6: false,
-    filter7: false,
-    filter8: false,
-    filter9: false,
-    filter10: false,
-  });
-  interface RealEstateItem {
-    article_price: string;
-    article_short_features: string[];
-    article_title: string;
-    공급면적: string;
-    전용면적: string;
-    층: string;
-    향: string;
-    "방/욕실": string;
-    복층여부: string;
-    입주가능일: string;
-  }
-  interface RealEstateResponse {
-    results: RealEstateItem[]; // 여기에 실제 데이터 타입을 명시하면 더 좋습니다!
-    message?: string;
-    error?: string;
-  }
-  // 검색 헨들러
-  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (e.target.value !== null) {
-      setSearchQuery(e.target.value);
-    }
-  };
-  const handlKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault(); // 엔터 입력 방지
-      handleSearch();
-    }
-  };
-  const handleSearch = () => {
-    if (!searchQuery.trim()) {
-      alert("검색어를 입력해주세요!");
-      return;
-    }
-    const params = new URLSearchParams();
-    params.set("q", searchQuery);
-    Object.entries(filterQuery).forEach(([key, value]) => {
-      if (value) {
-        params.set(key, "true"); // 필터가 true인 경우만 추가
-      }
-    });
+  const query = searchParams.get("q") || "";
+  const [filterQuery, setFilterQuery] = useState<FilterQuery>(
+    Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`filter${i + 1}`, false]))
+  );
 
-    navigate(`/search?${params.toString()}`);
-  };
-
-  const getRealEstateListings = async (query: string): Promise<RealEstateResponse | null> => {
+  const getRealEstateDatas = async ({ pageParam }: { pageParam: number }): Promise<RealEstateResponse> => {
     try {
-      const params = new URLSearchParams({ q: query });
-
-      const response = await fetch(`/search/realestate?${decodeURIComponent(params.toString())}`, {
+      const response = await fetch(`/search/realestate?q=${query}&cursor=${pageParam}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
 
-      if (!response.ok) {
-        // HTTP 상태 코드가 200이 아닌 경우
-        const errorData = await response.json();
-        throw new Error(errorData?.message || "Failed to fetch real estate listings");
-      }
+      if (!response.ok) throw new Error("Failed to fetch real estate listings");
 
-      const json = await response.json();
-      return json;
+      const data: RealEstateResponse = await response.json();
+
+      return data;
     } catch (error) {
-      console.error("Error fetching real estate listings:", error);
-      return null;
+      console.error("Error fetching real estate data:", error);
+      return { results: [] };
     }
   };
-  const { status, data: realEstateResults } = useQuery({
+
+  const { data, status, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ["search", query],
-    queryFn: () => getRealEstateListings(query!),
-    enabled: !!query, // query가 존재할 때만 실행
-    retry: 10,
+    queryFn: getRealEstateDatas,
+    initialPageParam: 0,
+
+    getNextPageParam: (lastPage) => {
+      //한번에 8개씩 불러오고 8개보다 적은 갯수가 들어오면 불러오기 종료
+      if (lastPage.results.length < 8) {
+        return undefined;
+      }
+      return lastPage.results[lastPage.results.length - 1].postId;
+    },
   });
+
+  const { ref, inView } = useInView({
+    threshold: 0,
+    delay: 0,
+  });
+
+  const isFetchingRef = useRef(false);
+
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("mousedown", calTextareaHeight);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("mousedown", calTextareaHeight);
-    };
-  }, []);
+    if (inView && !isFetchingRef.current && hasNextPage) {
+      console.log("fetchNextPage 실행됨");
+      isFetchingRef.current = true;
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (searchBarRef.current?.contains(event.target as Node)) {
-      return setWhitSpace("pre-line");
-    }
-    return setWhitSpace("nowrap");
-  };
-
-  const calTextareaHeight = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  };
-
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    isDragging.current = true;
-    isMoving.current = false;
-    startX.current = event.clientX;
-    scrollLeft.current = tagListRef.current?.scrollLeft || 0;
-    document.body.style.cursor = "grabbing";
-  };
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging.current || !tagListRef.current) return;
-    isMoving.current = true;
-    event.preventDefault();
-    event.stopPropagation();
-    const x = event.clientX;
-    const walk = x - startX.current;
-    tagListRef.current.scrollLeft = scrollLeft.current - walk;
-  };
-
-  const handleMouseUp = () => {
-    isDragging.current = false;
-    document.body.style.cursor = "default";
-
-    setTimeout(() => {
-      isMoving.current = false;
-    }, 10);
-  };
-
-  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
-    isDragging.current = true;
-    startX.current = event.touches[0].clientX; // 터치 시작 위치
-    scrollLeft.current = tagListRef.current?.scrollLeft || 0;
-  };
-
-  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
-    if (!isDragging.current || !tagListRef.current) return;
-
-    const x = event.touches[0].clientX; // 현재 터치 위치
-    const walk = x - startX.current; // 이동 거리 계산
-    tagListRef.current.scrollLeft = scrollLeft.current - walk; // 스크롤 이동
-  };
-
-  const handleTouchEnd = () => {
-    isDragging.current = false;
-  };
-
-  const clickFilter = (index: number) => {
-    if (!isMoving.current) {
-      setColors((prevColor) => prevColor.map((color, i) => (i == index ? !color : color)));
-      setFilterQuery((prevFilterQuery: FilterQuery) => {
-        const key = `filter${index + 1}` as keyof FilterQuery;
-        return {
-          ...prevFilterQuery,
-          [key]: !prevFilterQuery[key],
-        };
+      fetchNextPage().finally(() => {
+        setTimeout(() => {
+          isFetchingRef.current = false;
+        }, 10);
       });
     }
-  };
-  const renderdContent = () => {
-    if (status === "pending") {
-      return <span>Loading...</span>;
-    }
-
-    if (status === "error") {
-      return <span>Error</span>;
-    }
-
-    if (status === "success" && realEstateResults?.results?.length) {
-      return (
-        <div className="real-estate-container">
-          {realEstateResults.results.map((realEstateResult, index) => (
-            <div className="real-estate-card" key={index}>
-              <img
-                src="/image/sampleRoom.jpg" /* 실제 이미지 URL로 변경 */
-                alt={realEstateResult.article_title}
-                className="real-estate-thumbnail"
-              />
-              <div className="real-estate-content">
-                <h3 className="real-estate-title">{realEstateResult.article_title}</h3>
-                <p className="real-estate-price">{realEstateResult.article_price.toLocaleString()} KRW</p>
-                <div className="real-estate-features">
-                  {realEstateResult.article_short_features.map((feature: string) => (
-                    <p key={feature}>{feature}</p>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    return null; // 데이터가 없을 경우 null 반환
-  }; // `status`와 `realEstateResults`가 변경될 때만 재계산됨
+  }, [inView, hasNextPage, fetchNextPage]);
 
   return (
     <>
-      <div ref={searchBarRef} className="search-bar">
-        <div
-          className="icon-wrpper"
-          style={{ paddingRight: "13px", paddingLeft: "14px", cursor: "pointer" }}
-          onClick={() => navigate("/")}
-        >
-          <img src="/image/logo.svg" />
-        </div>
-        <form>
-          <div className="textarea-wrapper">
-            <textarea
-              className="search-textarea"
-              ref={textareaRef}
-              onInput={calTextareaHeight}
-              value={searchQuery}
-              onChange={handleInput}
-              onKeyDown={handlKeyDown}
-              rows={1}
-              placeholder="Type something here..."
-              style={{ whiteSpace: whitSpace }}
-            />
-          </div>
-          <div className="icon-wrpper">
-            <span style={{ color: "rgb(94, 94, 94)" }}>
-              <CancelIcon />
-            </span>
-          </div>
-          <span className="line"></span>
-          <span>
-            <SearchIcon width="24" height="24" />
-          </span>
-        </form>
+      <div style={{ marginTop: "40px" }}></div>
+      <SearchBar />
+      <div className="filter-bar" style={{ marginTop: "30px" }} onClick={() => setIsOpen(true)}>
+        <span>IT 개발 전체</span>
+        <DownArrow />
       </div>
-      <div className="tag-list-scrolling">
-        <div
-          className="tag-list-wrapper"
-          ref={tagListRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleTouchStart} // 터치 시작
-          onTouchMove={handleTouchMove} // 터치 이동
-          onTouchEnd={handleTouchEnd} // 터치 종료
-        >
-          {Array.from({ length: 10 }, (_, i) => (
-            <li
-              key={i}
-              className="tag-list"
-              onClick={() => clickFilter(i)}
-              style={{
-                backgroundColor: filterQuery[`filter${i + 1}` as keyof FilterQuery] ? "black" : "white",
-                color: filterQuery[`filter${i + 1}` as keyof FilterQuery] ? "white" : "black",
-              }}
-            >
-              필터 {i + 1}
-            </li>
-          ))}
-        </div>
-      </div>
-      <div>{renderdContent()}</div>
+      <FilterModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      <FilterList filterQuery={filterQuery} setFilterQuery={setFilterQuery} />
+      <SearchResults status={status} results={data?.pages.flatMap((page) => page.results) || []} />
+      <div ref={ref} style={{ height: 100 }} />
     </>
   );
 };

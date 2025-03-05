@@ -4,10 +4,12 @@ export const handlers = [
   http.get("/search/realestate", ({ request }) => {
     const url = new URL(request.url);
     const query = url.searchParams.get("q");
-
+    const cursor = parseInt(url.searchParams.get("cursor") as string) || 0;
+    console.log(cursor);
     return HttpResponse.json({
       results: [
         {
+          postId: cursor + 1,
           article_title: "일반원룸",
           article_price: "월세 2,000/30",
           article_short_features: ["원룸", "관리비 9만원", "공급23㎡ (전용18)"],
@@ -23,6 +25,7 @@ export const handlers = [
           입주가능일: "즉시입주 협의 가능",
         },
         {
+          postId: cursor + 2,
           article_title: "일반원룸",
           article_price: "월세 2,000/30",
           article_short_features: ["원룸", "관리비 9만원", "공급23㎡ (전용18)"],
@@ -38,6 +41,7 @@ export const handlers = [
           입주가능일: "즉시입주 협의 가능",
         },
         {
+          postId: cursor + 3,
           article_title: "일반원룸",
           article_price: "월세 2,000/30",
           article_short_features: ["원룸", "관리비 9만원", "공급23㎡ (전용18)"],
@@ -53,6 +57,7 @@ export const handlers = [
           입주가능일: "즉시입주 협의 가능",
         },
         {
+          postId: cursor + 4,
           article_title: "일반원룸",
           article_price: "월세 2,000/30",
           article_short_features: ["원룸", "관리비 9만원", "공급23㎡ (전용18)"],
@@ -68,6 +73,55 @@ export const handlers = [
           입주가능일: "즉시입주 협의 가능",
         },
         {
+          postId: cursor + 5,
+          article_title: "일반원룸",
+          article_price: "월세 2,000/30",
+          article_short_features: ["원룸", "관리비 9만원", "공급23㎡ (전용18)"],
+          "보증금/월세": "2,000/30만원",
+          융자금: "시세대비 30% 미만",
+          관리비: "9만원상세보기",
+          공급면적: "23㎡평",
+          전용면적: "18㎡ (전용률 78%)",
+          층: "8층/ 총 9층",
+          향: "(거실 기준) 남서향",
+          "방/욕실": "1/1개",
+          복층여부: "단층",
+          입주가능일: "즉시입주 협의 가능",
+        },
+        {
+          postId: cursor + 6,
+          article_title: "일반원룸",
+          article_price: "월세 2,000/30",
+          article_short_features: ["원룸", "관리비 9만원", "공급23㎡ (전용18)"],
+          "보증금/월세": "2,000/30만원",
+          융자금: "시세대비 30% 미만",
+          관리비: "9만원상세보기",
+          공급면적: "23㎡평",
+          전용면적: "18㎡ (전용률 78%)",
+          층: "8층/ 총 9층",
+          향: "(거실 기준) 남서향",
+          "방/욕실": "1/1개",
+          복층여부: "단층",
+          입주가능일: "즉시입주 협의 가능",
+        },
+        {
+          postId: cursor + 7,
+          article_title: "일반원룸",
+          article_price: "월세 2,000/30",
+          article_short_features: ["원룸", "관리비 9만원", "공급23㎡ (전용18)"],
+          "보증금/월세": "2,000/30만원",
+          융자금: "시세대비 30% 미만",
+          관리비: "9만원상세보기",
+          공급면적: "23㎡평",
+          전용면적: "18㎡ (전용률 78%)",
+          층: "8층/ 총 9층",
+          향: "(거실 기준) 남서향",
+          "방/욕실": "1/1개",
+          복층여부: "단층",
+          입주가능일: "즉시입주 협의 가능",
+        },
+        {
+          postId: cursor + 8,
           article_title: "일반원룸",
           article_price: "월세 2,000/30",
           article_short_features: ["원룸", "관리비 9만원", "공급23㎡ (전용18)"],
