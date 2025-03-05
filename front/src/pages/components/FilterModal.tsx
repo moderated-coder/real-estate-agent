@@ -38,25 +38,38 @@ const realEstateCategories = [
     subCategories: ["화장실 한 개", "융자금 적은", "소형 평수", "세대 분리"],
   },
 ];
+
 interface filterTagType {
   id: string;
   subcategory: string;
 }
+
 interface props {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
+
 const FilterModal = ({ isOpen, setIsOpen }: props) => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedCategoryName, setSelectedCategoryName] = useState<string | null>("");
+  const [selectedCategory, setSelectedCategory] = useState<{ id: string; name: string }>({
+    id: "",
+    name: "",
+  });
+
   const [filterTag, setFilterTag] = useState<filterTagType[]>([]);
-  // 필터 리스트 클릭 핸들러 (직군 선택 시 변경)
+
+  // 카테고리 선택 핸들러
   const handleCategoryClick = (categoryId: string, categoryName: string) => {
-    setSelectedCategory(categoryId);
-    setSelectedCategoryName(categoryName);
+    setSelectedCategory({ id: categoryId, name: categoryName });
   };
+
+  // 선택된 카테고리 초기화
+  const resetCategory = () => {
+    setSelectedCategory({ id: "", name: "" });
+  };
+
+  // 필터 리스트 렌더링 함수
   const renderCategory = () => {
-    if (selectedCategory === null) {
+    if (selectedCategory.id === "") {
       return (
         <ul key="main-list" className="filter-list">
           {realEstateCategories.map((category) => (
@@ -75,32 +88,30 @@ const FilterModal = ({ isOpen, setIsOpen }: props) => {
       return (
         <ul key="sub-list" className="sub-filter-list">
           {realEstateCategories
-            .find((category) => category.id === selectedCategory)
+            .find((category) => category.id === selectedCategory.id)
             ?.subCategories.map((subItem, index) => (
               <li
                 key={index}
                 className="sub-filter-item"
                 onClick={() => {
-                  if (selectedCategoryName === null) return;
+                  if (selectedCategory.name === null) return;
 
-                  if (
-                    !filterTag.some((filter) => filter.id === selectedCategoryName && filter.subcategory === subItem)
-                  ) {
-                    // 추가
-                    setFilterTag((prev) => [...prev, { id: selectedCategoryName, subcategory: subItem }]);
-                  } else {
-                    // 제거
-                    setFilterTag((prev) =>
-                      prev.filter((filter) => filter.id !== selectedCategoryName || filter.subcategory !== subItem)
-                    );
-                  }
+                  const exists = filterTag.some(
+                    (filter) => filter.id === selectedCategory.name && filter.subcategory === subItem
+                  );
+
+                  setFilterTag((prev) =>
+                    exists
+                      ? prev.filter((filter) => filter.id !== selectedCategory.name || filter.subcategory !== subItem)
+                      : [...prev, { id: selectedCategory.name, subcategory: subItem }]
+                  );
                 }}
               >
                 <input
                   type="checkbox"
                   id={subItem}
                   checked={filterTag.some(
-                    (filter) => filter.id === selectedCategoryName && filter.subcategory === subItem
+                    (filter) => filter.id === selectedCategory.name && filter.subcategory === subItem
                   )}
                 />
                 <label htmlFor={subItem}>{subItem}</label>
@@ -110,16 +121,11 @@ const FilterModal = ({ isOpen, setIsOpen }: props) => {
       );
     }
   };
+
   return (
     <AnimatePresence>
       {isOpen && (
-        <div
-          className="modal-overlay"
-          onClick={() => {
-            console.log("hi");
-            setIsOpen(false);
-          }}
-        >
+        <div className="modal-overlay" onClick={() => setIsOpen(false)}>
           <motion.div
             className="modal"
             initial={{ y: "100%" }}
@@ -129,43 +135,30 @@ const FilterModal = ({ isOpen, setIsOpen }: props) => {
           >
             {/* 모달 헤더 */}
             <div className="modal-header">
-              {selectedCategory && (
-                <span
-                  className="arrow"
-                  style={{ marginRight: "30px" }}
-                  onClick={() => {
-                    setSelectedCategoryName(null);
-                    setSelectedCategory(null);
-                  }}
-                >
+              {selectedCategory.id && (
+                <span className="arrow" style={{ marginRight: "30px" }} onClick={resetCategory}>
                   {"<"}
                 </span>
               )}
-              <h2>{selectedCategoryName ? selectedCategoryName : "부동산 선택"}</h2>
+              <h2>{selectedCategory.name ? selectedCategory.name : "부동산 선택"}</h2>
             </div>
 
             {renderCategory()}
-            {/* 필터링 정리 */}
+
+            {/* 선택된 필터 태그 */}
             <div className="active-filters">
-              {filterTag.map((tag) => {
-                return (
-                  <div className="active-filter-tag">
-                    <span>
-                      {tag.id}.{tag.subcategory}
-                    </span>
-                  </div>
-                );
-              })}
+              {filterTag.map((tag) => (
+                <div key={`${tag.id}-${tag.subcategory}`} className="active-filter-tag">
+                  <span>
+                    {tag.id}.{tag.subcategory}
+                  </span>
+                </div>
+              ))}
             </div>
+
             {/* 하단 버튼 */}
             <div className="modal-footer">
-              <button
-                className="reset-btn"
-                onClick={() => {
-                  setSelectedCategoryName(null);
-                  setSelectedCategory(null);
-                }}
-              >
+              <button className="reset-btn" onClick={resetCategory}>
                 <span className="no-autolink">초기화</span>
               </button>
               <button className="apply-btn" onClick={() => setIsOpen(false)}>
@@ -178,4 +171,5 @@ const FilterModal = ({ isOpen, setIsOpen }: props) => {
     </AnimatePresence>
   );
 };
+
 export default FilterModal;

@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 interface RealEstateItem {
   postId: number;
   article_price: string;
@@ -11,14 +12,20 @@ interface SearchResultsProps {
 }
 
 const SearchResults = ({ status, results }: SearchResultsProps) => {
-  console.log(results);
+  const navigate = useNavigate();
   if (status === "pending") return <span>Loading...</span>;
   if (status === "error") return <span>Error</span>;
   if (status === "success" && results?.length) {
     return (
       <div className="real-estate-container">
         {results.map((item, index) => (
-          <div className="real-estate-card" key={index}>
+          <div
+            className="real-estate-card"
+            key={index}
+            onClick={() => {
+              navigate(`/search/detail/${item.postId}`);
+            }}
+          >
             <img src="/image/sampleRoom.jpg" alt={item.article_title} className="real-estate-thumbnail" />
             <div className="real-estate-content">
               <h3 className="real-estate-title">{item.article_title}</h3>
