@@ -37,7 +37,7 @@ $ python main.py
 
 # Front - Home Search  
 실행 명령어
-- front 폴더에서
+- `cd front`
 - `npm install`
 - `npm run dev`
  
