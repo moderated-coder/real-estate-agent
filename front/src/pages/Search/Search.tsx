@@ -48,15 +48,11 @@ const Search = () => {
   };
 
   const { data, status, fetchNextPage, hasNextPage } = useInfiniteQuery({
-    queryKey: ["search", query],
+    queryKey: ["search", query], // 검색어 기반으로 캐싱
     queryFn: getRealEstateDatas,
     initialPageParam: 0,
-
     getNextPageParam: (lastPage) => {
-      //한번에 8개씩 불러오고 8개보다 적은 갯수가 들어오면 불러오기 종료
-      if (lastPage.results.length < 8) {
-        return undefined;
-      }
+      if (lastPage.results.length < 8) return undefined;
       return lastPage.results[lastPage.results.length - 1].postId;
     },
   });
@@ -70,7 +66,6 @@ const Search = () => {
 
   useEffect(() => {
     if (inView && !isFetchingRef.current && hasNextPage) {
-      console.log("fetchNextPage 실행됨");
       isFetchingRef.current = true;
 
       fetchNextPage().finally(() => {

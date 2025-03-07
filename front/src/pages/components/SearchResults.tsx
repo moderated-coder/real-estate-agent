@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 interface RealEstateItem {
   postId: number;
@@ -13,6 +14,20 @@ interface SearchResultsProps {
 
 const SearchResults = ({ status, results }: SearchResultsProps) => {
   const navigate = useNavigate();
+
+  // 스크롤 위치 저장
+  const saveScrollPosition = () => {
+    sessionStorage.setItem("scrollPosition", String(window.scrollY));
+  };
+
+  // 스크롤 위치 복원
+  useEffect(() => {
+    const savedPosition = sessionStorage.getItem("scrollPosition");
+    if (savedPosition) {
+      window.scrollTo(0, parseInt(savedPosition, 10));
+    }
+  }, []);
+
   if (status === "pending") return <span>Loading...</span>;
   if (status === "error") return <span>Error</span>;
   if (status === "success" && results?.length) {
@@ -23,6 +38,7 @@ const SearchResults = ({ status, results }: SearchResultsProps) => {
             className="real-estate-card"
             key={index}
             onClick={() => {
+              saveScrollPosition();
               navigate(`/search/detail/${item.postId}`);
             }}
           >

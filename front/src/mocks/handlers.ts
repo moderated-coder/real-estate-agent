@@ -5,7 +5,6 @@ export const handlers = [
     const url = new URL(request.url);
     const query = url.searchParams.get("q");
     const cursor = parseInt(url.searchParams.get("cursor") as string) || 0;
-    console.log(cursor);
     return HttpResponse.json({
       results: [
         {
