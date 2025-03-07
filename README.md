@@ -37,8 +37,9 @@ $ python main.py
 
 # Front - Home Search  
 실행 명령어
-- front 폴더에서 `npm install` `npm run start`
-  
+- front 폴더에서
+- `npm install`
+- `npm run dev`
  
 
 ## 기능  
@@ -46,9 +47,7 @@ $ python main.py
 - **검색어를 입력하여 검색할 수 있는 기능**  
 - **검색 결과에 필터를 적용하는 기능** *(개발 중)*  
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/425ae2aa-7b8d-46f7-b39e-e63c8c70dd78" alt="Home Search 화면">
-</p>
+
 
 ---
 
@@ -59,9 +58,7 @@ $ python main.py
 ## 기능  
 - **검색 기능 제공**  
 - **검색 결과를 카드 형태로 출력**  
-- **썸네일을 클릭하여 검색 상세 페이지로 이동** *(개발 중)*  
+- **썸네일을 클릭하여 검색 상세 페이지로 이동** 
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/06729f44-01cb-4ef9-86c5-d68fedc2fbf9" alt="Search 화면">
-</p>
+
 
