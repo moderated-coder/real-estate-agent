@@ -28,4 +28,4 @@ async def get_article_list(unit_code: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run("backend.main:app", host="localhost", port=8000, reload=True)
+    uvicorn.run("main:app", host="localhost", port=8000, reload=True)
