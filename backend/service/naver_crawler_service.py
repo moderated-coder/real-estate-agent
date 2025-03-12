@@ -3,9 +3,8 @@ import time
 import random
 import requests
 import logging
-import pandas as pd
+from typing import Dict, Any
 from tqdm import tqdm
-from typing import List, Dict, Any
 
 from utils.crawl_utils import cookies, headers
 from repository.mongo_database import MongoDatabase
@@ -13,10 +12,9 @@ from repository.mongo_database import MongoDatabase
 
 class NaverCrawlerService:
 
-    def __init__(self,):
+    def __init__(self):
         # logger
         self.logger = self._get_logger()
-        self.unit_code_table = self._get_unit_code_table()
         self.cluster_request_url = "https://m.land.naver.com/cluster/clusterList"
         self.article_list_request_url = "https://m.land.naver.com/cluster/ajax/articleList"
         self.article_detail_request_url = "https://fin.land.naver.com/articles/"
@@ -24,15 +22,7 @@ class NaverCrawlerService:
         self.mongo_db = MongoDatabase()
         self.mongo_db.connect()
 
-    def _get_unit_code_table(self) -> pd.DataFrame:
-        unit_code_filepath = "../data/unit_code_list.txt"
-        unit_code_table: pd.DataFrame = pd.read_csv(unit_code_filepath, encoding='cp949', sep="\t")
-        unit_code_table.columns = ["code", "name", "status"]
-        unit_code_table = unit_code_table[unit_code_table.status == "존재"]
-        return unit_code_table
-
     def _get_logger(self, service_name: str = "naver_crawler_service"):
-        
         logger = logging.getLogger()
         logger.setLevel(logging.WARN)
         formatter = logging.Formatter(f"%(asctime)s [{service_name.upper()}] %(levelname)s: %(message)s")
@@ -42,18 +32,19 @@ class NaverCrawlerService:
         return logger
 
     def get_random_dongname(self):
-        return self.unit_code_table.sample(1).name
+        return self.mongo_db.get_random_dongname()
 
     def get_unit_code_from_dongname(self, dongname: str) -> Dict[str, Any]:
         try:
-            target_unit_info = self.unit_code_table[self.unit_code_table.name.str.contains(dongname)]
-            target_unit_code = target_unit_info.code.tolist()[0]
-            self.logger.warning(f"{dongname} has detected...")
-            return {"unit_code": target_unit_code, "status": "success"}
+            unit_code_obj = self.mongo_db.get_unit_code_by_dongname(dongname)
+            if unit_code_obj:
+                self.logger.warning(f"{dongname} has detected...")
+                return {"unit_code": unit_code_obj.get("unit_code"), "status": "success"}
+            return {"unit_code": "", "status": "fail", "error": "Unit code not found"}
         except Exception as e:
-            return {"unit_code": "", "status": "fail", "error": e}
+            return {"unit_code": "", "status": "fail", "error": str(e)}
 
-    def get_article_list_from_unit_code(self, unit_code: str) -> List[str]:
+    def get_article_list_from_unit_code(self, unit_code: str) -> Dict[str, Any]:
         try:
             # 네이버 부동산 매물지도의 동그라미들에 해당하는 메타정보 수집
             params = dict()

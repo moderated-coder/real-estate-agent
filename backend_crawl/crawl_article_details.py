@@ -1,8 +1,5 @@
 import logging
 import requests
-import pickle
-import time
-import random
 
 import pandas as pd
 from tqdm import tqdm
