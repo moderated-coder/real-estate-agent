@@ -17,6 +17,8 @@ $ db.createUser({user : "root", pwd : "1234", roles : [ "root" ]})
 - 서버실행
 ```
 $ cd backend/
+$ poetry shell
+$ poetry install
 $ python main.py
 ```
 - swagger: localhost:8000/docs
