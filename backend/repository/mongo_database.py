@@ -1,6 +1,7 @@
 import logging
 from typing import List, Dict, Any, Optional
 from pymongo import MongoClient
+import datetime
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -15,6 +16,7 @@ class MongoDatabase:
         self.db = None
         self.article_collection = None
         self.unit_code_collection = None
+        self.crawl_history_collection = None
 
     def connect(self):
         try:
@@ -22,6 +24,7 @@ class MongoDatabase:
             self.db = self.client["real_estate_agent"]
             self.article_collection = self.db["articles"]
             self.unit_code_collection = self.db["unit_codes"]
+            self.crawl_history_collection = self.db["crawl_history"]
             return True
         except Exception as e:
             logger.error(f"Failed to connect to MongoDB: {e}")
@@ -67,3 +70,40 @@ class MongoDatabase:
         if result:
             return result[0].get("dongname")
         return None
+        
+    def update_crawl_history(self, unit_code: str) -> bool:
+        if self.crawl_history_collection is None:
+            return False
+
+        try:
+            current_time = datetime.datetime.now()
+            self.crawl_history_collection.update_one(
+                {"unit_code": unit_code},
+                {"$set": {"last_crawled_at": current_time}},
+                upsert=True
+            )
+            return True
+        except Exception as e:
+            logger.error(f"Failed to update crawl history: {e}")
+            return False
+            
+    def get_unit_codes_to_crawl(self, hours_threshold: int = 6) -> List[str]:
+        if self.unit_code_collection is None or self.crawl_history_collection is None:
+            logger.error("Collections not initialized")
+            return []
+
+        try:
+            threshold_time = datetime.datetime.now() - datetime.timedelta(hours=hours_threshold)
+            all_unit_codes = [doc["unit_code"] for doc in self.unit_code_collection.find({}, {"unit_code": 1, "_id": 0})]
+            recent_crawls = {
+                doc["unit_code"] for doc in self.crawl_history_collection.find(
+                    {"last_crawled_at": {"$gt": threshold_time}},
+                    {"unit_code": 1, "_id": 0}
+                )
+            }
+
+            codes_to_crawl = [code for code in all_unit_codes if code not in recent_crawls]
+            return codes_to_crawl
+        except Exception as e:
+            logger.error(f"Failed to get unit codes to crawl: {e}")
+            return []

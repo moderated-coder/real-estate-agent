@@ -3,7 +3,7 @@ import time
 import random
 import requests
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, List
 from tqdm import tqdm
 
 from utils.crawl_utils import cookies, headers
@@ -88,8 +88,41 @@ class NaverCrawlerService:
             # article_df = pd.DataFrame.from_dict(article_list)
             self.logger.warning(article_list[:10])
 
-            self.mongo_db.insert_data(article_list)
-            return {"collection_name": self.mongo_db.collection_name, "status": "success"}
+            if self.mongo_db.insert_data(article_list):
+                self.mongo_db.update_crawl_history(unit_code)
+                return {"status": "success", "articles_count": len(article_list)}
+            return {"status": "fail", "error": "Failed to insert data"}
         except Exception as e:
             self.logger.error(e)
-            return {"status": "fail"}
+            return {"status": "fail", "error": str(e)}
+            
+    def get_unit_codes_to_crawl(self, hours_threshold: int = 6) -> List[str]:
+        return self.mongo_db.get_unit_codes_to_crawl(hours_threshold)
+        
+    def crawl_outdated_unit_codes(self, hours_threshold: int = 6) -> Dict[str, Any]:
+        unit_codes = self.get_unit_codes_to_crawl(hours_threshold)
+        
+        results = {
+            "total": len(unit_codes),
+            "success": 0,
+            "failed": 0,
+            "details": []
+        }
+        
+        for unit_code in unit_codes:
+            self.logger.warning(f"Crawling unit code: {unit_code}")
+            result = self.get_article_list_from_unit_code(unit_code)
+            
+            if result.get("status") == "success":
+                results["success"] += 1
+            else:
+                results["failed"] += 1
+                
+            results["details"].append({
+                "unit_code": unit_code,
+                "result": result
+            })
+            
+            time.sleep(random.uniform(2.0, 5.0))
+            
+        return results

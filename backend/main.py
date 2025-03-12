@@ -1,16 +1,24 @@
 import uvicorn
-from fastapi import FastAPI
-
+from fastapi import FastAPI, BackgroundTasks
+from contextlib import asynccontextmanager
 from service.naver_crawler_service import NaverCrawlerService
 from scripts.load_unit_codes import load_unit_codes
+from utils.scheduler import scheduler
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    load_unit_codes()
+    app.state.crawler_service = naver_crawler_service
+    scheduler.schedule_job(60 * 6, naver_crawler_service.crawl_outdated_unit_codes) # 6 hour
+    scheduler.start()
+
+    yield
+
+    scheduler.stop()
+
+app = FastAPI(lifespan=lifespan)
 naver_crawler_service = NaverCrawlerService()
 
-@app.on_event("startup")
-def on_startup():
-    # Load unit codes if needed
-    load_unit_codes()
 
 @app.get("/")
 async def root():
