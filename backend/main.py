@@ -9,7 +9,7 @@ from utils.scheduler import scheduler
 async def lifespan(app: FastAPI):
     load_unit_codes()
     app.state.crawler_service = naver_crawler_service
-    scheduler.schedule_job(60 * 6, naver_crawler_service.crawl_outdated_unit_codes) # 6 hour
+    scheduler.schedule_job(60, naver_crawler_service.crawl_outdated_unit_codes) # 1 hour
     scheduler.start()
 
     yield
