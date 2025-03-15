@@ -1,4 +1,5 @@
 import logging
+import random
 from typing import List, Dict, Any, Optional
 from pymongo import MongoClient
 import datetime
@@ -64,11 +65,11 @@ class MongoDatabase:
             logger.error("Unit code collection not initialized")
             return None
         
-        pipeline = [{"$sample": {"size": 1}}]
+        pipeline = [{"$sample": {"size": 1000}}]
         result = list(self.unit_code_collection.aggregate(pipeline))
         
         if result:
-            return result[0].get("dongname")
+            return random.sample(result, k=1)[0].get("dongname")
         return None
         
     def update_crawl_history(self, unit_code: str) -> bool:
