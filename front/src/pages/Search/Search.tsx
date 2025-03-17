@@ -6,7 +6,7 @@ import { useInView } from "react-intersection-observer";
 //import FilterList from "@/pages/components/FilterList";
 
 import SearchResults from "@/pages/components/SearchResults";
-import SearchBar from "../components/\bSearchBar";
+import SearchBar from "../components/SearchBar";
 import FilterModal from "../components/FilterModal";
 import DownArrow from "@/assets/down_arrow.svg?react";
 

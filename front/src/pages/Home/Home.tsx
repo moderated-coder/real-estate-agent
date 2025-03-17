@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import SearchBar from "../components/\bSearchBar";
+import SearchBar from "../components/SearchBar";
 import DownArrow from "@/assets/down_arrow.svg?react";
 import FilterModal from "../components/FilterModal";
 
