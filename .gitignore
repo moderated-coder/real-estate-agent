@@ -176,4 +176,7 @@ cython_debug/
 *.pkl
 model/*
 
+<<<<<<< HEAD
 .idea
+=======
+>>>>>>> 14dc898 (필터 컴포넌트 따로 분리)

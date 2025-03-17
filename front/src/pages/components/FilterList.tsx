@@ -1,11 +1,13 @@
-import { useRef } from "react";
-
-interface FilterListProps {
-  filterQuery: Record<string, boolean>;
-  setFilterQuery: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+import { useRef, useState } from "react";
+interface FilterQuery {
+  [key: string]: boolean;
 }
 
-const FilterList = ({ filterQuery, setFilterQuery }: FilterListProps) => {
+const FilterList = () => {
+  const [filterQuery, setFilterQuery] = useState<FilterQuery>(
+    Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`filter${i + 1}`, false]))
+  );
+
   const tagListRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const isMoving = useRef(false);

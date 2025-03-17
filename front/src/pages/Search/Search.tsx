@@ -1,15 +1,15 @@
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
-import FilterList from "@/pages/components/FilterList";
+// 필터 다른 디자인
+//import FilterList from "@/pages/components/FilterList";
+
 import SearchResults from "@/pages/components/SearchResults";
 import SearchBar from "../components/\bSearchBar";
 import FilterModal from "../components/FilterModal";
 import DownArrow from "@/assets/down_arrow.svg?react";
-interface FilterQuery {
-  [key: string]: boolean;
-}
+
 interface Post {
   postId: number;
   article_price: string;
@@ -24,9 +24,6 @@ const Search = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
-  const [filterQuery, setFilterQuery] = useState<FilterQuery>(
-    Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`filter${i + 1}`, false]))
-  );
 
   const getRealEstateDatas = async ({ pageParam }: { pageParam: number }): Promise<RealEstateResponse> => {
     try {
@@ -51,6 +48,10 @@ const Search = () => {
     queryKey: ["search", query], // 검색어 기반으로 캐싱
     queryFn: getRealEstateDatas,
     initialPageParam: 0,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
     getNextPageParam: (lastPage) => {
       if (lastPage.results.length < 8) return undefined;
       return lastPage.results[lastPage.results.length - 1].postId;
@@ -62,19 +63,11 @@ const Search = () => {
     delay: 0,
   });
 
-  const isFetchingRef = useRef(false);
-
   useEffect(() => {
-    if (inView && !isFetchingRef.current && hasNextPage) {
-      isFetchingRef.current = true;
-
-      fetchNextPage().finally(() => {
-        setTimeout(() => {
-          isFetchingRef.current = false;
-        }, 10);
-      });
+    if (inView && status !== "pending" && hasNextPage) {
+      fetchNextPage();
     }
-  }, [inView, hasNextPage, fetchNextPage]);
+  }, [inView, hasNextPage, fetchNextPage, status]);
 
   return (
     <>
@@ -85,7 +78,8 @@ const Search = () => {
         <DownArrow />
       </div>
       <FilterModal isOpen={isOpen} setIsOpen={setIsOpen} />
-      <FilterList filterQuery={filterQuery} setFilterQuery={setFilterQuery} />
+      {/* 필터 다른 디자인 */}
+      {/* <FilterList /> */}
       <SearchResults status={status} results={data?.pages.flatMap((page) => page.results) || []} />
       <div ref={ref} style={{ height: 100 }} />
     </>
