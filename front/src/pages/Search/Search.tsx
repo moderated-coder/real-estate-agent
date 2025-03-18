@@ -1,21 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
-import { useInView } from "react-intersection-observer";
-// 필터 다른 디자인
-//import FilterList from "@/pages/components/FilterList";
+import { Virtuoso } from "react-virtuoso";
 
 import SearchResults from "@/pages/components/SearchResults";
 import SearchBar from "../components/SearchBar";
 import FilterModal from "../components/FilterModal";
 import DownArrow from "@/assets/down_arrow.svg?react";
-
+import { VirtuosoGrid } from "react-virtuoso";
 interface Post {
   postId: number;
   article_price: string;
   article_short_features: string[];
   article_title: string;
 }
+
 interface RealEstateResponse {
   results: Post[];
 }
@@ -25,6 +24,7 @@ const Search = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
 
+  // 데이터를 불러오는 함수
   const getRealEstateDatas = async ({ pageParam }: { pageParam: number }): Promise<RealEstateResponse> => {
     try {
       const response = await fetch(`/search/realestate?q=${query}&cursor=${pageParam}`, {
@@ -44,6 +44,7 @@ const Search = () => {
     }
   };
 
+  // React Query의 무한 스크롤 쿼리 사용
   const { data, status, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ["search", query], // 검색어 기반으로 캐싱
     queryFn: getRealEstateDatas,
@@ -58,30 +59,52 @@ const Search = () => {
     },
   });
 
-  const { ref, inView } = useInView({
-    threshold: 0,
-    delay: 0,
-  });
-
-  useEffect(() => {
-    if (inView && status !== "pending" && hasNextPage) {
+  // Virtuoso의 `endReached` 콜백을 활용해 추가 데이터 로드
+  const loadMore = () => {
+    if (hasNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, fetchNextPage, status]);
+  };
+
+  // 데이터를 평탄화하여 리스트 형태로 변환
+  const results = data?.pages.flatMap((page) => page.results) || [];
 
   return (
     <>
-      <div style={{ marginTop: "40px" }}></div>
-      <SearchBar />
-      <div className="filter-bar" style={{ marginTop: "30px" }} onClick={() => setIsOpen(true)}>
-        <span>IT 개발 전체</span>
-        <DownArrow />
+      <div style={{ minHeight: "100vh", height: "auto" }}>
+        <SearchBar />
+        <div className="filter-bar" style={{ marginTop: "30px" }} onClick={() => setIsOpen(true)}>
+          <span>IT 개발 전체</span>
+          <DownArrow />
+        </div>
+        <FilterModal isOpen={isOpen} setIsOpen={setIsOpen} />
+
+        <VirtuosoGrid
+          data={results}
+          useWindowScroll
+          endReached={loadMore}
+          listClassName="grid-container"
+          itemContent={(index, post) => (
+            <div className="grid-item">
+              <SearchResults key={post.postId} status={status} results={post} />
+            </div>
+          )}
+        />
       </div>
-      <FilterModal isOpen={isOpen} setIsOpen={setIsOpen} />
-      {/* 필터 다른 디자인 */}
-      {/* <FilterList /> */}
-      <SearchResults status={status} results={data?.pages.flatMap((page) => page.results) || []} />
-      <div ref={ref} style={{ height: 100 }} />
+
+      <style>
+        {`
+          .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+            padding: 16px;
+          }
+          .grid-item {
+            width: 100%;
+          }
+        `}
+      </style>
     </>
   );
 };

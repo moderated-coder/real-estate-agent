@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 interface RealEstateItem {
   postId: number;
@@ -9,12 +9,12 @@ interface RealEstateItem {
 
 interface SearchResultsProps {
   status: "pending" | "error" | "success";
-  results: RealEstateItem[] | null;
+  results: RealEstateItem;
 }
 
 const SearchResults = ({ status, results }: SearchResultsProps) => {
   const navigate = useNavigate();
-
+  console.log("results", results);
   // 스크롤 위치 저장
   const saveScrollPosition = () => {
     sessionStorage.setItem("scrollPosition", String(window.scrollY));
@@ -30,31 +30,26 @@ const SearchResults = ({ status, results }: SearchResultsProps) => {
 
   if (status === "pending") return <span>Loading...</span>;
   if (status === "error") return <span>Error</span>;
-  if (status === "success" && results?.length) {
+  if (status === "success") {
     return (
-      <div className="real-estate-container">
-        {results.map((item, index) => (
-          <div
-            className="real-estate-card"
-            key={index}
-            onClick={() => {
-              saveScrollPosition();
-              navigate(`/search/detail/${item.postId}`);
-            }}
-          >
-            <img src="/image/sampleRoom.jpg" alt={item.article_title} className="real-estate-thumbnail" />
-            <div className="real-estate-content">
-              <h3 className="real-estate-title">{item.article_title}</h3>
-              <h3 className="real-estate-title">{item.postId}</h3>
-              <p className="real-estate-price">{item.article_price.toLocaleString()} KRW</p>
-              <div className="real-estate-features">
-                {item.article_short_features.map((feature) => (
-                  <p key={feature}>{feature}</p>
-                ))}
-              </div>
-            </div>
+      <div
+        className="real-estate-card"
+        onClick={() => {
+          saveScrollPosition();
+          navigate(`/search/detail/${item.postId}`);
+        }}
+      >
+        <img src="/image/sampleRoom.jpg" alt={results.article_title} className="real-estate-thumbnail" />
+        <div className="real-estate-content">
+          <h3 className="real-estate-title">{results.article_title}</h3>
+          <h3 className="real-estate-title">{results.postId}</h3>
+          <p className="real-estate-price">{results.article_price.toLocaleString()} KRW</p>
+          <div className="real-estate-features">
+            {results.article_short_features.map((feature) => (
+              <p key={feature}>{feature}</p>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     );
   }

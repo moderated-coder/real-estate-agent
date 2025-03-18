@@ -1,3 +1,8 @@
+html,
+body {
+  height: auto;
+  overflow: auto;
+}
 /* iPhone에서 자동 링크 감지 방지 */
 .no-autolink,
 .filter-button {
