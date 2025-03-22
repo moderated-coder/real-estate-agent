@@ -287,8 +287,10 @@ a {
 }
 .textarea-wrapper {
   display: flex;
-  flex-wrap: wrap;
+
   flex: 1;
+
+  justify-content: space-between;
 }
 .textarea-wrapper > form {
   width: 100%;
@@ -335,6 +337,24 @@ a {
   font-size: 16px;
   flex: 100%;
   line-height: 39px;
+}
+.search-button {
+  margin-left: 8px;
+  padding: 8px 16px;
+  background-color: #007aff;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  height: 36px;
+}
+
+.search-button:hover {
+  background-color: #005fcc;
 }
 .line {
   border-left: 1px solid #dadce0;
@@ -408,13 +428,25 @@ a {
 }
 
 /* search 썸네일 css */
-.real-estate-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 카드가 자동으로 정렬 */
-  gap: 16px;
-  padding: 20px;
+.result-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  align-items: center;
 }
-
+.grid-wrapper {
+  width: 1000px; /* 원하는 너비 */
+  margin: 0 auto; /* 좌우 중앙 정렬 */
+}
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  padding: 16px;
+}
+.grid-item {
+  width: 100%;
+}
 .real-estate-card {
   background: white;
   border-radius: 8px;

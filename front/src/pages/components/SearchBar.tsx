@@ -1,9 +1,11 @@
 import { useState, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import Search from "@/assets/search.svg?react";
 const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const textareaRef = useRef<HTMLInputElement>(null);
-
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   // 검색 핸들러
   const handleInput = () => {
@@ -19,6 +21,7 @@ const SearchBar = () => {
       alert("검색어를 입력해주세요!");
       return;
     }
+    queryClient.removeQueries({ queryKey: ["search", searchQuery] });
     navigate(`/search?q=${searchQuery}`);
   };
 
@@ -31,16 +34,15 @@ const SearchBar = () => {
   return (
     <div className="filter-bar home-bar">
       <div className="textarea-wrapper">
-        <form>
-          <input
-            className="search-textarea"
-            ref={textareaRef}
-            value={searchQuery}
-            onChange={handleInput}
-            onKeyDown={handleKeyDown}
-            placeholder="찾고 싶은 부동산 정보를 입력해주세요"
-          />
-        </form>
+        <input
+          className="search-textarea"
+          ref={textareaRef}
+          value={searchQuery}
+          onChange={handleInput}
+          onKeyDown={handleKeyDown}
+          placeholder="찾고 싶은 부동산 정보를 입력해주세요"
+        />
+        <Search style={{ width: "30px" }} onClick={handleSearch} />
       </div>
     </div>
   );

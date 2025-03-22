@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
-import { Virtuoso } from "react-virtuoso";
-
 import SearchResults from "@/pages/components/SearchResults";
 import SearchBar from "../components/SearchBar";
 import FilterModal from "../components/FilterModal";
 import DownArrow from "@/assets/down_arrow.svg?react";
 import { VirtuosoGrid } from "react-virtuoso";
+import useFilterTagsStore from "@/store/useFilterTag";
 interface Post {
   postId: number;
   article_price: string;
@@ -24,10 +23,17 @@ const Search = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
 
+  const { filterTags } = useFilterTagsStore();
   // 데이터를 불러오는 함수
   const getRealEstateDatas = async ({ pageParam }: { pageParam: number }): Promise<RealEstateResponse> => {
     try {
-      const response = await fetch(`/search/realestate?q=${query}&cursor=${pageParam}`, {
+      const params = new URLSearchParams();
+      params.set("q", query);
+      filterTags.forEach((tag) => {
+        params.append(tag.categoryName, tag.subcategoryName);
+      });
+
+      const response = await fetch(`/search/realestate?${params.toString()}&cursor=${pageParam}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -74,37 +80,24 @@ const Search = () => {
       <div style={{ minHeight: "100vh", height: "auto" }}>
         <SearchBar />
         <div className="filter-bar" style={{ marginTop: "30px" }} onClick={() => setIsOpen(true)}>
-          <span>IT 개발 전체</span>
+          <span>부동산 검색 조건</span>
           <DownArrow />
         </div>
         <FilterModal isOpen={isOpen} setIsOpen={setIsOpen} />
-
-        <VirtuosoGrid
-          data={results}
-          useWindowScroll
-          endReached={loadMore}
-          listClassName="grid-container"
-          itemContent={(index, post) => (
-            <div className="grid-item">
-              <SearchResults key={post.postId} status={status} results={post} />
-            </div>
-          )}
-        />
+        <div className="grid-wrapper">
+          <VirtuosoGrid
+            data={results}
+            useWindowScroll
+            endReached={loadMore}
+            listClassName="grid-container"
+            itemContent={(index, post) => (
+              <div key={index} className="grid-item">
+                <SearchResults key={post.postId} status={status} post={post} />
+              </div>
+            )}
+          />
+        </div>
       </div>
-
-      <style>
-        {`
-          .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 16px;
-            padding: 16px;
-          }
-          .grid-item {
-            width: 100%;
-          }
-        `}
-      </style>
     </>
   );
 };

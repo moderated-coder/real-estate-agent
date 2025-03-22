@@ -1,5 +1,6 @@
 import { useState, Dispatch, SetStateAction } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import useFilterTagsStore from "@/store/useFilterTag";
 
 const realEstateCategories = [
   {
@@ -39,11 +40,6 @@ const realEstateCategories = [
   },
 ];
 
-interface filterTagType {
-  id: string;
-  subcategory: string;
-}
-
 interface props {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -55,19 +51,17 @@ const FilterModal = ({ isOpen, setIsOpen }: props) => {
     name: "",
   });
 
-  const [filterTag, setFilterTag] = useState<filterTagType[]>([]);
+  const { filterTags, toggleFilterTag, resetFilterTag } = useFilterTagsStore();
 
-  // 카테고리 선택 핸들러
   const handleCategoryClick = (categoryId: string, categoryName: string) => {
     setSelectedCategory({ id: categoryId, name: categoryName });
   };
 
-  // 선택된 카테고리 초기화
   const resetCategory = () => {
     setSelectedCategory({ id: "", name: "" });
+    resetFilterTag();
   };
 
-  // 필터 리스트 렌더링 함수
   const renderCategory = () => {
     if (selectedCategory.id === "") {
       return (
@@ -89,32 +83,18 @@ const FilterModal = ({ isOpen, setIsOpen }: props) => {
         <ul key="sub-list" className="sub-filter-list">
           {realEstateCategories
             .find((category) => category.id === selectedCategory.id)
-            ?.subCategories.map((subItem, index) => (
-              <li
-                key={index}
-                className="sub-filter-item"
-                onClick={() => {
-                  if (selectedCategory.name === null) return;
-
-                  const exists = filterTag.some(
-                    (filter) => filter.id === selectedCategory.name && filter.subcategory === subItem
-                  );
-
-                  setFilterTag((prev) =>
-                    exists
-                      ? prev.filter((filter) => filter.id !== selectedCategory.name || filter.subcategory !== subItem)
-                      : [...prev, { id: selectedCategory.name, subcategory: subItem }]
-                  );
-                }}
-              >
+            ?.subCategories.map((subcategoryName, index) => (
+              <li key={index} className="sub-filter-item">
                 <input
                   type="checkbox"
-                  id={subItem}
-                  checked={filterTag.some(
-                    (filter) => filter.id === selectedCategory.name && filter.subcategory === subItem
+                  id={subcategoryName}
+                  checked={filterTags.some(
+                    (filterTag) =>
+                      filterTag.categoryName === selectedCategory.name && filterTag.subcategoryName === subcategoryName
                   )}
+                  onChange={() => toggleFilterTag(selectedCategory.name, subcategoryName)}
                 />
-                <label htmlFor={subItem}>{subItem}</label>
+                <label htmlFor={subcategoryName}>{subcategoryName}</label>
               </li>
             ))}
         </ul>
@@ -133,7 +113,6 @@ const FilterModal = ({ isOpen, setIsOpen }: props) => {
             transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫히지 않도록 방지
           >
-            {/* 모달 헤더 */}
             <div className="modal-header">
               {selectedCategory.id && (
                 <span className="arrow" style={{ marginRight: "30px" }} onClick={resetCategory}>
@@ -145,18 +124,16 @@ const FilterModal = ({ isOpen, setIsOpen }: props) => {
 
             {renderCategory()}
 
-            {/* 선택된 필터 태그 */}
             <div className="active-filters">
-              {filterTag.map((tag) => (
-                <div key={`${tag.id}-${tag.subcategory}`} className="active-filter-tag">
+              {filterTags.map((tag) => (
+                <div key={`${tag.categoryName}-${tag.subcategoryName}`} className="active-filter-tag">
                   <span>
-                    {tag.id}.{tag.subcategory}
+                    {tag.categoryName}.{tag.subcategoryName}
                   </span>
                 </div>
               ))}
             </div>
 
-            {/* 하단 버튼 */}
             <div className="modal-footer">
               <button className="reset-btn" onClick={resetCategory}>
                 <span className="no-autolink">초기화</span>
