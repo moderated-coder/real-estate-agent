@@ -1,4 +1,4 @@
-import { useEffect, Fragment } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 interface RealEstateItem {
   postId: number;
@@ -7,14 +7,13 @@ interface RealEstateItem {
   article_title: string;
 }
 
-interface SearchResultsProps {
+interface SearchPostProps {
   status: "pending" | "error" | "success";
-  results: RealEstateItem;
+  post: RealEstateItem;
 }
 
-const SearchResults = ({ status, results }: SearchResultsProps) => {
+const Searchpost = ({ status, post }: SearchPostProps) => {
   const navigate = useNavigate();
-  console.log("results", results);
   // 스크롤 위치 저장
   const saveScrollPosition = () => {
     sessionStorage.setItem("scrollPosition", String(window.scrollY));
@@ -36,16 +35,16 @@ const SearchResults = ({ status, results }: SearchResultsProps) => {
         className="real-estate-card"
         onClick={() => {
           saveScrollPosition();
-          navigate(`/search/detail/${item.postId}`);
+          navigate(`/search/detail/${post.postId}`);
         }}
       >
-        <img src="/image/sampleRoom.jpg" alt={results.article_title} className="real-estate-thumbnail" />
+        <img src="/image/sampleRoom.jpg" alt={post.article_title} className="real-estate-thumbnail" />
         <div className="real-estate-content">
-          <h3 className="real-estate-title">{results.article_title}</h3>
-          <h3 className="real-estate-title">{results.postId}</h3>
-          <p className="real-estate-price">{results.article_price.toLocaleString()} KRW</p>
+          <h3 className="real-estate-title">{post.article_title}</h3>
+          <h3 className="real-estate-title">{post.postId}</h3>
+          <p className="real-estate-price">{post.article_price.toLocaleString()} KRW</p>
           <div className="real-estate-features">
-            {results.article_short_features.map((feature) => (
+            {post.article_short_features.map((feature) => (
               <p key={feature}>{feature}</p>
             ))}
           </div>
@@ -56,4 +55,4 @@ const SearchResults = ({ status, results }: SearchResultsProps) => {
   return null;
 };
 
-export default SearchResults;
+export default Searchpost;
