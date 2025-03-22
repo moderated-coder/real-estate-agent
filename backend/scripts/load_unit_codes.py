@@ -10,12 +10,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def load_unit_codes():
     
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [LOAD_UNIT_CODES] %(levelname)s: %(message)s"
-    )
-    logger = logging.getLogger(__name__)
-    
     client = MongoClient("mongodb://localhost:27017/")
     db = client["real_estate_agent"]
     collection = db["unit_codes"]
@@ -52,13 +46,13 @@ def load_unit_codes():
         # 벌크 오퍼레이션 실행
         if operations:
             result = collection.bulk_write(operations)
-            logger.info(f"Upserted: {result.upserted_count}, Modified: {result.modified_count}, Total: {len(operations)}")
+            print(f"Upserted: {result.upserted_count}, Modified: {result.modified_count}, Total: {len(operations)}")
         else:
-            logger.info("No unit codes to import")
+            print("No unit codes to import")
         
     except BulkWriteError as bwe:
-        logger.error(f"Bulk write error: {bwe.details}")
+        print(f"Bulk write error: {bwe.details}")
         raise
     except Exception as e:
-        logger.error(f"Error loading unit codes: {e}")
+        print(f"Error loading unit codes: {e}")
         raise

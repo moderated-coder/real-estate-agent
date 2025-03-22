@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI, BackgroundTasks
 from contextlib import asynccontextmanager
 from service.naver_crawler_service import NaverCrawlerService
+from service.gu_service import GuService
 from scripts.load_unit_codes import load_unit_codes
 from utils.scheduler import scheduler
 
@@ -18,11 +19,21 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 naver_crawler_service = NaverCrawlerService()
+gu_service = GuService()
 
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+@app.get("/crawl_by_guname")
+async def crawl_by_guname(guname: str):
+    return gu_service.crawl(guname)
+
+
+@app.get("/test_get_dongname_list")
+async def test_get_dongname_list(guname: str):
+    return gu_service._get_dongname_unit_code_list(guname)
 
 @app.get("/get_random_dongname")
 async def get_random_dongname():

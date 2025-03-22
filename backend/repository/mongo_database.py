@@ -49,6 +49,7 @@ class MongoDatabase:
             logger.error("Unit code collection not initialized")
             return None
         return self.unit_code_collection
+
     
     def get_unit_code_by_dongname(self, dongname: str) -> Optional[Dict[str, Any]]:
         if self.unit_code_collection is None:
