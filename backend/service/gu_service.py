@@ -124,7 +124,7 @@ class GuService:
                 lgeo = area["lgeo"]; lat = area["lat"]; lon = area["lon"]
                 for page_num in range(0, 25):
                     random_t = random.uniform(1.0, 6.0)
-                    time.sleep(random_t)
+                    # time.sleep(random_t)
                     request_params = {
                         'lgeo': lgeo, 'rletTpCd': 'OPST:VL:OR', 'tradTpCd': 'B1:B2', 'z': '14', "page": page_num
                     }
