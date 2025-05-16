@@ -3,6 +3,7 @@ from fastapi import FastAPI, BackgroundTasks
 from contextlib import asynccontextmanager
 from service.naver_crawler_service import NaverCrawlerService
 from service.gu_service import GuService
+from service.gu_service_selenium import GuService as GuService2
 from scripts.load_unit_codes import load_unit_codes
 from utils.scheduler import scheduler
 
@@ -10,7 +11,7 @@ from utils.scheduler import scheduler
 async def lifespan(app: FastAPI):
     load_unit_codes()
     app.state.crawler_service = naver_crawler_service
-    scheduler.schedule_job(60, naver_crawler_service.crawl_outdated_unit_codes) # 1 hour
+    # scheduler.schedule_job(60, naver_crawler_service.crawl_outdated_unit_codes) # 1 hour
     scheduler.start()
 
     yield
