@@ -1,9 +1,7 @@
 import uvicorn
 from fastapi import FastAPI, BackgroundTasks
 from contextlib import asynccontextmanager
-from service.naver_crawler_service import NaverCrawlerService
 from service.gu_service import GuService
-from service.gu_service_selenium import GuService as GuService2
 from scripts.load_unit_codes import load_unit_codes
 from utils.scheduler import scheduler
 
