@@ -66,6 +66,9 @@ class GuService:
 
 
     def crawl(self, guname: str):
+        if guname is None:
+            guname = "영등포구"
+        
         try:
             start = time.time()
             dong_name_list, unit_code_list = self._get_dongname_unit_code_list(guname)
@@ -215,6 +218,10 @@ class GuService:
 
             total_df["gu"] = guname; total_df["dong"] = dong_name
             self.logger.info(f"total record:\n{total_df.sample(1).to_dict('records')[0]}")
+
+            save_localpath = f"~/data/{guname}_data.csv"
+            total_df.to_csv(save_localpath, index=False)
+            self.logger.info(f"save dataframe at : {save_localpath}")
 
             if self.mongo_db.insert_data(total_df.to_dict("records")):
                 self.mongo_db.update_crawl_history(unit_code)
