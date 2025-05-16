@@ -67,11 +67,14 @@ class GuService:
 
     def crawl(self, guname: str):
         try:
+            start = time.time()
             dong_name_list, unit_code_list = self._get_dongname_unit_code_list(guname)
             for dong_name, unit_code in zip(dong_name_list, unit_code_list):
                 crawl_result = self._get_article_from_unit_code(guname, dong_name, unit_code)
                 if crawl_result["status"] == "success":
                     self.logger.info(f"[{guname}]:[{dong_name}]:[{unit_code}]: crawl finished...")
+            end = time.time()
+            self.logger.info(f"spend total time: {end - start}")
             return True
         except Exception as e:
             self.logger.warning(f"error: {e}")
@@ -83,7 +86,7 @@ class GuService:
         dong_response = [r.get("dongname").split(" ")[-1] for r in dong_response]
         self.logger.info(f"collected dong({len(dong_response)} 개): {dong_response}")
 
-        unit_codes = [self._get_unit_code_from_dongname(r)["unit_code"] for r in dong_response]
+        unit_codes = [self._get_unit_code_from_dongname(r)["unit_code"] for r in dong_response][1:]
         self.logger.info(f"collectd unitcode({len(unit_codes)} 개): {unit_codes}")
         return dong_response, unit_codes
 
@@ -123,8 +126,8 @@ class GuService:
             for area in tqdm(area_articles):
                 lgeo = area["lgeo"]; lat = area["lat"]; lon = area["lon"]
                 for page_num in range(0, 25):
-                    random_t = random.uniform(1.0, 6.0)
-                    # time.sleep(random_t)
+                    random_t = random.uniform(6.0, 15.0)
+                    time.sleep(random_t)
                     request_params = {
                         'lgeo': lgeo, 'rletTpCd': 'OPST:VL:OR', 'tradTpCd': 'B1:B2', 'z': '14', "page": page_num
                     }
