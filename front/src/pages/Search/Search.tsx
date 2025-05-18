@@ -12,6 +12,8 @@ interface Post {
   article_price: string;
   article_short_features: string[];
   article_title: string;
+  deposit_fee: number;
+  rent_fee: number;
 }
 
 interface RealEstateResponse {
@@ -25,7 +27,13 @@ const Search = () => {
 
   const { filterTags } = useFilterTagsStore();
   // 데이터를 불러오는 함수
-  const getRealEstateDatas = async ({ pageParam }: { pageParam: number }): Promise<RealEstateResponse> => {
+  const getRealEstateDatas = async ({
+    pageParam,
+    query,
+  }: {
+    pageParam: number;
+    query: string;
+  }): Promise<RealEstateResponse> => {
     try {
       const params = new URLSearchParams();
       params.set("q", query);
@@ -53,8 +61,9 @@ const Search = () => {
   // React Query의 무한 스크롤 쿼리 사용
   const { data, status, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ["search", query], // 검색어 기반으로 캐싱
-    queryFn: getRealEstateDatas,
+    queryFn: ({ pageParam }) => getRealEstateDatas({ pageParam, query }),
     initialPageParam: 0,
+    enabled: Boolean(query && query.trim()),
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchInterval: false,
