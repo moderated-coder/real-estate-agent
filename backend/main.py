@@ -8,7 +8,7 @@ from utils.scheduler import scheduler
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_unit_codes()
-    app.state.crawler_service = naver_crawler_service
+    app.state.crawler_service = GuService
 
     scheduler.schedule_job(60*48, gu_service.crawl) # 48 hour
     scheduler.start()
@@ -18,7 +18,6 @@ async def lifespan(app: FastAPI):
     scheduler.stop()
 
 app = FastAPI(lifespan=lifespan)
-naver_crawler_service = NaverCrawlerService()
 gu_service = GuService()
 
 
@@ -34,18 +33,6 @@ async def crawl_by_guname(guname: str):
 @app.get("/test_get_dongname_list")
 async def test_get_dongname_list(guname: str):
     return gu_service._get_dongname_unit_code_list(guname)
-
-@app.get("/get_random_dongname")
-async def get_random_dongname():
-    return naver_crawler_service.get_random_dongname()
-
-@app.get("/get_unit_code")
-async def get_unit_code(dongname: str):
-    return naver_crawler_service.get_unit_code_from_dongname(dongname=dongname)
-
-@app.get("/get_article_list")
-async def get_article_list(unit_code: str):
-    return naver_crawler_service.get_article_list_from_unit_code(unit_code)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True)
