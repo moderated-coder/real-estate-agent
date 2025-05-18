@@ -5,6 +5,8 @@ interface RealEstateItem {
   article_price: string;
   article_short_features: string[];
   article_title: string;
+  deposit_fee: number;
+  rent_fee: number;
 }
 
 interface SearchPostProps {
@@ -42,7 +44,9 @@ const Searchpost = ({ status, post }: SearchPostProps) => {
         <div className="real-estate-content">
           <h3 className="real-estate-title">{post.article_title}</h3>
           <h3 className="real-estate-title">{post.postId}</h3>
-          <p className="real-estate-price">{post.article_price.toLocaleString()} KRW</p>
+          <p className="real-estate-price">
+            {post.deposit_fee.toLocaleString()}/{post.rent_fee.toLocaleString()} KRW
+          </p>
           <div className="real-estate-features">
             {post.article_short_features.map((feature) => (
               <p key={feature}>{feature}</p>
