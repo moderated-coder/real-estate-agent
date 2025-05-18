@@ -219,7 +219,7 @@ class GuService:
             total_df["gu"] = guname; total_df["dong"] = dong_name
             self.logger.info(f"total record:\n{total_df.sample(1).to_dict('records')[0]}")
 
-            save_localpath = f"~/data/{guname}_data.csv"
+            save_localpath = f"~/Downloads/{guname}_{dong_name}_data.csv"
             total_df.to_csv(save_localpath, index=False)
             self.logger.info(f"save dataframe at : {save_localpath}")
 
