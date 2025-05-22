@@ -1,6 +1,9 @@
 import { http, HttpResponse } from "msw";
-
+import { mockProperties } from "./mockData";
 export const handlers = [
+  http.get("/api/properties", ({ request }) => {
+    return HttpResponse.json(mockProperties);
+  }),
   http.get("/search/realestate", ({ request }) => {
     const url = new URL(request.url);
     const query = url.searchParams.get("q");

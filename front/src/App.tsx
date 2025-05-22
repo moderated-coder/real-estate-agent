@@ -12,8 +12,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
-        <Route path="/Home" element={<Home />} />
-        <Route path="/" element={<Search />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/search/detail/:id" element={<Detail />} />
       </Routes>
       <ReactQueryDevtools initialIsOpen={false} />

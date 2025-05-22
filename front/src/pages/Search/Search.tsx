@@ -6,7 +6,7 @@ import SearchBar from "../components/SearchBar";
 import FilterModal from "../components/FilterModal";
 import DownArrow from "@/assets/down_arrow.svg?react";
 import { VirtuosoGrid } from "react-virtuoso";
-import useFilterTagsStore from "@/store/useFilterTag";
+// import useFilterTagsStore from "@/store/useFilterTag";
 interface Post {
   postId: number;
   article_price: string;
@@ -19,49 +19,42 @@ interface Post {
 interface RealEstateResponse {
   results: Post[];
 }
+// 데이터를 불러오는 함수
+const getRealEstateDatas = async ({
+  pageParam,
+  queryKey,
+}: {
+  pageParam: number;
+  queryKey: string[];
+}): Promise<RealEstateResponse> => {
+  try {
+    const [, search] = queryKey;
 
+    const response = await fetch(`/search/realestate?${search.toString()}&cursor=${pageParam}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (!response.ok) throw new Error("Failed to fetch real estate listings");
+
+    const data: RealEstateResponse = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching real estate data:", error);
+    return { results: [] };
+  }
+};
 const Search = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
 
-  const { filterTags } = useFilterTagsStore();
-  // 데이터를 불러오는 함수
-  const getRealEstateDatas = async ({
-    pageParam,
-    query,
-  }: {
-    pageParam: number;
-    query: string;
-  }): Promise<RealEstateResponse> => {
-    try {
-      const params = new URLSearchParams();
-      params.set("q", query);
-      filterTags.forEach((tag) => {
-        params.append(tag.categoryName, tag.subcategoryName);
-      });
-
-      const response = await fetch(`/search/realestate?${params.toString()}&cursor=${pageParam}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch real estate listings");
-
-      const data: RealEstateResponse = await response.json();
-
-      return data;
-    } catch (error) {
-      console.error("Error fetching real estate data:", error);
-      return { results: [] };
-    }
-  };
-
   // React Query의 무한 스크롤 쿼리 사용
   const { data, status, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ["search", query], // 검색어 기반으로 캐싱
-    queryFn: ({ pageParam }) => getRealEstateDatas({ pageParam, query }),
+    queryFn: ({ pageParam, queryKey }) => getRealEstateDatas({ pageParam, queryKey }),
     initialPageParam: 0,
     enabled: Boolean(query && query.trim()),
     refetchOnMount: false,
