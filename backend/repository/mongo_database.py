@@ -43,6 +43,23 @@ class MongoDatabase:
         except Exception as e:
             logger.error(f"Failed to insert data: {e}")
             return False
+
+    def get_article_list(self, gu_name: str = None, dong_name: str = None):
+        if self.article_collection is None:
+            logger.error("Article collection not initialized")
+            return None
+        pipeline = []
+        query = {}
+        if gu_name:
+            query["gu"] = {"$regex": gu_name}
+        if dong_name:
+            query["dong"] = {"$regex": dong_name}
+
+        if query:
+            pipeline.append({"$match": query})
+        pipeline.append({"$sample": {"size": 1000000000}})
+
+        return list(self.article_collection.aggregate(pipeline))
     
     def get_unit_code_collection(self):
         if self.unit_code_collection is None:
