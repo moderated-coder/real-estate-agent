@@ -1,12 +1,14 @@
 import { useState, useRef } from "react";
+
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import Search from "@/assets/search.svg?react";
 const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const textareaRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const [_, setSearchParams] = useSearchParams();
+
   // 검색 핸들러
   const handleInput = () => {
     if (textareaRef.current) {
@@ -22,7 +24,7 @@ const SearchBar = () => {
       return;
     }
     queryClient.removeQueries({ queryKey: ["search", searchQuery] });
-    navigate(`/search?q=${searchQuery}`);
+    setSearchParams({ q: searchQuery });
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
