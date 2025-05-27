@@ -3,6 +3,7 @@ import time
 import random
 import requests
 import logging
+import math
 import traceback
 import pandas as pd
 from typing import Dict, Any, List
@@ -242,3 +243,19 @@ class GuService:
             self.logger.error(traceback.format_exc())
             return {"status": "fail", "error": str(e)}
             
+
+    def get_real_estate_data(self):
+        db = MongoDatabase()
+        db.connect()
+        articles = db.get_sample_articles()
+        for article in articles:
+            article["_id"] = str(article["_id"])
+        return GuService.sanitize(articles)
+
+    def get_articles_by_sort(self, sort_key: str = None, cursor_key: int = None, cursor_id:str = None):
+        db = MongoDatabase()
+        db.connect()
+        articles = db.get_articles_by_sort(sort_key=sort_key, cursor_key=cursor_key, cursor_id=cursor_id)
+        for article in articles:
+            article["_id"] = str(article["_id"])
+        return GuService.sanitize(articles)
