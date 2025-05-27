@@ -39,10 +39,12 @@ $ python main.py
 
 # Front - Home Search  
 실행 명령어
-- `cd front`
-- `npm install`
-- `npm run dev`
- 
+```
+$ brew install node
+$ cd front
+$ npm install
+$ npm run dev
+``` 
 
 ## 기능  
 - 사용자가 처음 접하는 화면으로, 검색 기능을 제공합니다. 
