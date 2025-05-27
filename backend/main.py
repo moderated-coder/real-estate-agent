@@ -30,7 +30,7 @@ async def root():
     return {"message": "Hello World"}
 
 @app.get("/crawl_by_guname")
-async def crawl_by_guname(guname: str):
+async def crawl_by_guname(guname: str = "영등포구"):
     return gu_service.crawl(guname)
 
 
@@ -42,6 +42,14 @@ async def get_article(filter_condition_list: Dict[str, Any]):
 @app.get("/test_get_dongname_list")
 async def test_get_dongname_list(guname: str):
     return gu_service._get_dongname_unit_code_list(guname)
+
+@app.get("/get_real_estate_data")
+async def get_real_estate_data():
+    return gu_service.get_real_estate_data()
+
+@app.get("/get_articles_by_sort")
+async def get_articles_by_sort(sort_key: str = "deposit_fee_asc", cursor_key: int = None, cursor_id: str = None):
+    return gu_service.get_articles_by_sort(sort_key=sort_key, cursor_key=cursor_key, cursor_id=cursor_id)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True)
