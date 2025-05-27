@@ -3,7 +3,7 @@ import random
 from typing import List, Dict, Any, Optional
 from pymongo import MongoClient
 import datetime
-
+from bson import ObjectId
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
@@ -125,4 +125,78 @@ class MongoDatabase:
             return codes_to_crawl
         except Exception as e:
             logger.error(f"Failed to get unit codes to crawl: {e}")
+            return []
+        
+    def get_sample_articles(self, limit: int = 2) -> List[Dict[str, Any]]:
+        if self.article_collection is None:
+            logger.error("Article collection not initialized")
+            return []
+
+        try:
+            articles = list(self.article_collection.find({"gu": {"$in": ['영등포구', '구로구']}, "$or": [
+                {"deposit_fee": {"$gt": 5000}},
+                {"deposit_fee": 5000, "_id": {"$gt": ObjectId("663562eacd4756f719d38968")}}
+            ]}).limit(limit))
+            return articles
+        except Exception as e:
+            logger.error(f"Failed to fetch sample articles: {e}")
+            return []
+        
+
+    def get_deposit_fee_asc(self, limit: int = 10, deposit_fee_gte: int = 0,  last_cursor: dict = None) -> List[Dict[str, Any]]:
+
+        if self.article_collection is None:
+            logger.error("Article collection not initialized")
+            return []
+
+        try:
+            articles = list(self.article_collection.find({
+                "gu": { "$in": ["영등포구", "구로구"] },
+                "$and": [
+                    { "deposit_fee": { "$gte": deposit_fee_gte } },
+                    {
+                        "$or": [
+                            { "deposit_fee": { "$gt": last_cursor["deposit_fee"] } },
+                            { "deposit_fee": last_cursor["deposit_fee"], "_id": { "$gt": last_cursor["_id"] } }
+                        ]
+                    }
+                ]
+            }).sort([("deposit_fee", 1), ("_id", 1)]).limit(limit))
+            return articles
+        except Exception as e:
+            logger.error(f"Failed to fetch sample articles: {e}")
+            return []
+
+    def get_articles_by_sort(self,  sort_key: str = "deposit_fee_asc", cursor_key: int = None, cursor_id:str = None) -> List[Dict[str, Any]]:
+        sort_map = {
+            "deposit_fee_asc": ("deposit_fee", 1),
+            "deposit_fee_desc": ("deposit_fee", -1),
+            "area_asc": ("area", 1),
+            "area_desc": ("area", -1),
+            "created_at_desc": ("created_at", -1)
+        }
+
+        sort_key, sort_dir = sort_map.get(sort_key, ("deposit_fee", 1))
+
+        base_filter = {
+            "gu": {"$in": ["영등포구", "구로구"]}
+        }
+
+        # 커서 필터 조건 추가
+        if cursor_key is not None and cursor_id is not None:
+            op = "$gt" if sort_dir == 1 else "$lt"
+            base_filter["$or"] = [
+                { sort_key: { op: cursor_key } },
+                { sort_key: cursor_key, "_id": { op: cursor_id } }
+            ]
+
+        try:
+            articles = list(
+                self.article_collection.find(base_filter)
+                .sort([(sort_key, sort_dir), ("_id", sort_dir)])
+                .limit(10)
+            )
+            return articles
+        except Exception as e:
+            logger.error(f"쿼리 실패: {e}")
             return []
