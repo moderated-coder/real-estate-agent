@@ -53,7 +53,18 @@ class GuService:
         self.mongo_db = MongoDatabase()
         self.mongo_db.connect()
 
-
+    # json에 nan, inf 값이 있으면 에러를 일으켜서 None으로 변환하는 함수
+    # 나중에 db에 넣을 때부터 None으로 변화하는 방식으로 변환해야할 것 같다
+    @staticmethod
+    def sanitize(obj):
+        if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
+            return None
+        if isinstance(obj, dict):
+            return {k: GuService.sanitize(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [GuService.sanitize(v) for v in obj]
+        return obj
+    
     def _get_logger(self, service_name: str):
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.INFO)
