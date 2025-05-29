@@ -1,6 +1,5 @@
-import ClientInit from "@/components/ClientInit";
-
 import "./globals.css";
+import RQProviders from "./_components/RQProvider";
 
 export default function RootLayout({
   children,
@@ -8,10 +7,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body suppressHydrationWarning>
-        <ClientInit />
-        {children}
+        <RQProviders>
+          <main className="max-w-6xl mx-auto px-4 pt-4 pb-10">{children}</main>
+        </RQProviders>
       </body>
     </html>
   );
