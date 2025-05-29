@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import MakerClustering from "@/lib/naver/MakerClustering";
+import MakerClustering from "@/src/lib/naver/MakerClustering";
 
 function isLatLng(obj: unknown): obj is naver.maps.LatLng {
   return typeof (obj as any).lat === "function" && typeof (obj as any).lng === "function";
