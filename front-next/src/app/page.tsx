@@ -2,7 +2,7 @@
 
 import Script from "next/script";
 import dynamic from "next/dynamic";
-const Map = dynamic(() => import("@/components/Map"), { ssr: false });
+const Map = dynamic(() => import("@/src/app/_components/Map"), { ssr: false });
 
 export default function Home() {
   const HOME_PATH = "/images";
