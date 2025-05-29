@@ -24,3 +24,22 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .custom-range {
+    @apply w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer;
+
+    &::-webkit-slider-thumb {
+      @apply appearance-none w-5 h-5 bg-white rounded-full;
+      box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    &::-moz-range-thumb {
+      @apply w-5 h-5 bg-white border border-black rounded-full;
+      box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.5);
+    }
+  }
+}
