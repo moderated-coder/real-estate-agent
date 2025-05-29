@@ -1,5 +1,5 @@
 from typing import Dict, Any
-
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from fastapi import FastAPI, BackgroundTasks
 from contextlib import asynccontextmanager
@@ -21,6 +21,13 @@ async def lifespan(app: FastAPI):
     scheduler.stop()
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  
+    allow_credentials=True,
+    allow_methods=["*"],  # GET, POST 등 허용할 메서드
+    allow_headers=["*"],  # Authorization, Content-Type 등
+)
 gu_service = GuService()
 article_read_service = ArticleReadService()
 
