@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.77.2",
+    "@tanstack/react-query-devtools": "^5.77.2",
     "next": "15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -16,6 +18,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@mswjs/http-middleware": "^0.10.3",
+    "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4",
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
