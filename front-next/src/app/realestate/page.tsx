@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import SearchBar from "./_components/SearchBar";
+
 import EstateItemCard from "./_components/EstateItemCard";
 export interface Article {
   _id: string;
@@ -45,7 +45,6 @@ const getRealEstateDatas = async ({
 
   if (!response.ok) throw new Error("Failed to fetch real estate listings");
   const res = await response.json();
-  console.log(res);
   return res;
 };
 
@@ -61,8 +60,6 @@ export default function RealEstate() {
 
   return (
     <>
-      <SearchBar />
-
       <div className="flex justify-center my-4 gap-2">
         <button
           className="px-3 py-1 border rounded disabled:opacity-50"
