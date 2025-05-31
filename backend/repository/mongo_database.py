@@ -167,36 +167,39 @@ class MongoDatabase:
             logger.error(f"Failed to fetch sample articles: {e}")
             return []
 
-    def get_articles_by_sort(self,  sort_key: str = "deposit_fee_asc", cursor_key: int = None, cursor_id:str = None) -> List[Dict[str, Any]]:
-        sort_map = {
-            "deposit_fee_asc": ("deposit_fee", 1),
-            "deposit_fee_desc": ("deposit_fee", -1),
-            "area_asc": ("area", 1),
-            "area_desc": ("area", -1),
-            "created_at_desc": ("created_at", -1)
-        }
-
-        sort_key, sort_dir = sort_map.get(sort_key, ("deposit_fee", 1))
+    def get_articles(self,  gu: str, deposit_min: int = None, deposit_max: int = None, rent_min: int = None, rent_max: int = None, cursor: str = None) -> List[Dict[str, Any]]:
+        if gu is None or deposit_min is None or deposit_max is None or rent_min is None or rent_max is None or cursor is None:
+            raise ValueError("gu, deposit_min, deposit_max, rent_min, and rent_max are required.")
 
         base_filter = {
-            "gu": {"$in": ["영등포구", "구로구"]}
+            "gu": {"$in": [gu]},
+            "deposit_fee": {"$gte": deposit_min, "$lte": deposit_max},
+            "rent_fee": {"$gte": rent_min, "$lte": rent_max}
         }
 
-        # 커서 필터 조건 추가
-        if cursor_key is not None and cursor_id is not None:
-            op = "$gt" if sort_dir == 1 else "$lt"
-            base_filter["$or"] = [
-                { sort_key: { op: cursor_key } },
-                { sort_key: cursor_key, "_id": { op: cursor_id } }
-            ]
+        if cursor and cursor != "1":
+            try:
+                base_filter["_id"] = {"$lt": ObjectId(cursor)}  # 🔥 핵심: 커서 기반 조건
+            except Exception as e:
+                logger.warning(f"Invalid cursor ID: {cursor}, error: {e}")
 
         try:
-            articles = list(
+            total_count = self.article_collection.count_documents(base_filter)
+            real_estate_list = list(
                 self.article_collection.find(base_filter)
-                .sort([(sort_key, sort_dir), ("_id", sort_dir)])
+                .sort("_id", -1)  # 최신순
                 .limit(10)
             )
-            return articles
+
+            # 다음 커서: 마지막 _id
+            next_cursor = str(real_estate_list[-1]["_id"]) if len(real_estate_list) == 10 else None
+        
+            return {
+                "total_count": total_count,
+                "real_estate_list": real_estate_list,
+                "nextPage": next_cursor
+            }
+
         except Exception as e:
             logger.error(f"쿼리 실패: {e}")
-            return []
+            return {"total_count": 0, "real_estate_list": [], "nextPage": None}
