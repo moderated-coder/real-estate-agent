@@ -1,9 +1,9 @@
 import Image from "next/image";
 import { Article } from "../page";
-export default function EstateItemCard({ data }: { data: Article[] }) {
+export default function EstateItemCard({ realEstateList }: { realEstateList: Article[] }) {
   return (
     <div>
-      {data?.map((item) => (
+      {realEstateList?.map((item) => (
         <div key={item._id} className="flex border p-4 mb-3 rounded bg-white shadow">
           <div className="w-600 ">
             <div className="font-semibold">{item.article_title}</div>
