@@ -1,11 +1,25 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
 const NavBar = () => {
   const [showSlider, setShowSlider] = useState(false);
   const [depositRange, setDepositRange] = useState<[number, number]>([3500, 60000]);
   const [monthlyRentRange, setMonthlyRentRange] = useState<[number, number]>([0, 100000]);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const depositMin = params.get("deposit_min");
+    const depositMax = params.get("deposit_max");
+    const rentMin = params.get("rent_min");
+    const rentMax = params.get("rent_max");
+
+    if (depositMin && depositMax) {
+      setDepositRange([Number(depositMin), Number(depositMax)]);
+    }
+    if (rentMin && rentMax) {
+      setMonthlyRentRange([Number(rentMin), Number(rentMax)]);
+    }
+  }, []);
   return (
     <div>
       <header className="sticky top-0 z-50 w-full bg-white shadow-sm border-b">
