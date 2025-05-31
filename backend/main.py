@@ -7,6 +7,7 @@ from service.gu_service import GuService
 from service.article_read_service import ArticleReadService
 from scripts.load_unit_codes import load_unit_codes
 from utils.scheduler import scheduler
+from fastapi import Query
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -50,13 +51,27 @@ async def get_article(filter_condition_list: Dict[str, Any]):
 async def test_get_dongname_list(guname: str):
     return gu_service._get_dongname_unit_code_list(guname)
 
-@app.get("/get_real_estate_data")
-async def get_real_estate_data():
-    return gu_service.get_real_estate_data()
 
-@app.get("/get_articles_by_sort")
-async def get_articles_by_sort(sort_key: str = "deposit_fee_asc", cursor_key: int = None, cursor_id: str = None):
-    return gu_service.get_articles_by_sort(sort_key=sort_key, cursor_key=cursor_key, cursor_id=cursor_id)
+
+
+
+@app.get("/get_articles")
+async def get_articles(
+    gu: str = Query(..., description="정렬 기준 (예: deposit_fee_asc)"),
+    deposit_min: int = Query(..., description="최소 보증금"),
+    deposit_max: int = Query(..., description="최대 보증금"),
+    rent_min: int = Query(..., description="최소 월세"),
+    rent_max: int = Query(..., description="최대 월세"),
+    cursor: str = Query(..., description="페이지 번호"),
+):
+    return gu_service.get_articles(
+        gu=gu,
+        deposit_min=deposit_min,
+        deposit_max=deposit_max,
+        rent_min=rent_min,
+        rent_max=rent_max,
+        cursor=cursor,
+    )
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True)
