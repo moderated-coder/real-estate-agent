@@ -252,10 +252,12 @@ class GuService:
             article["_id"] = str(article["_id"])
         return GuService.sanitize(articles)
 
-    def get_articles_by_sort(self, sort_key: str = None, cursor_key: int = None, cursor_id:str = None):
+    def get_articles(self, gu: str, deposit_min: int, deposit_max: int, rent_min: int, rent_max: int, cursor: str):
+        if gu is None or deposit_min is None or deposit_max is None or rent_min is None or rent_max is None or cursor is None:
+            raise ValueError("gu, deposit_min, deposit_max, rent_min, and rent_max are required.")
         db = MongoDatabase()
         db.connect()
-        articles = db.get_articles_by_sort(sort_key=sort_key, cursor_key=cursor_key, cursor_id=cursor_id)
-        for article in articles:
+        articles = db.get_articles(gu=gu, deposit_min=deposit_min, deposit_max=deposit_max, rent_min=rent_min, rent_max=rent_max,cursor=cursor)
+        for article in articles['real_estate_list']:
             article["_id"] = str(article["_id"])
         return GuService.sanitize(articles)
