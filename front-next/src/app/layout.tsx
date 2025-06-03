@@ -9,7 +9,6 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body suppressHydrationWarning>
-        <div></div>
         <RQProviders>
           <main className="max-w-6xl mx-auto px-4 pt-4 pb-10">{children}</main>
         </RQProviders>
