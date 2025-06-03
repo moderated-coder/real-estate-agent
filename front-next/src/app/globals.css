@@ -33,12 +33,12 @@ body {
     @apply absolute w-full appearance-none;
 
     &::-webkit-slider-thumb {
-      @apply appearance-none w-5 h-5 bg-white rounded-full pointer-events-auto mt-[-4px];
+      @apply appearance-none w-7 h-7 bg-white rounded-full pointer-events-auto mt-[-10px];
       box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.5);
     }
 
     &::-moz-range-thumb {
-      @apply w-5 h-5 bg-white border border-black rounded-full pointer-events-auto mt-[4px];
+      @apply w-7 h-7 bg-white border border-black rounded-full pointer-events-auto mt-[-8px];
       box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.5);
     }
   }
