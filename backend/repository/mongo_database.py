@@ -18,6 +18,7 @@ class MongoDatabase:
         self.article_collection = None
         self.unit_code_collection = None
         self.crawl_history_collection = None
+        self.user_collection = None
 
     def connect(self):
         try:
@@ -26,6 +27,7 @@ class MongoDatabase:
             self.article_collection = self.db["articles"]
             self.unit_code_collection = self.db["unit_codes"]
             self.crawl_history_collection = self.db["crawl_history"]
+            self.user_collection = self.db["users"]
             return True
         except Exception as e:
             logger.error(f"Failed to connect to MongoDB: {e}")
@@ -167,7 +169,7 @@ class MongoDatabase:
             logger.error(f"Failed to fetch sample articles: {e}")
             return []
 
-    def get_articles(self,  gu: str, deposit_min: int = None, deposit_max: int = None, rent_min: int = None, rent_max: int = None, cursor: str = None) -> List[Dict[str, Any]]:
+    def get_articles(self,  gu: str, dong: Optional[str], deposit_min: int = None, deposit_max: int = None, rent_min: int = None, rent_max: int = None, cursor: str = None) -> List[Dict[str, Any]]:
         if gu is None or deposit_min is None or deposit_max is None or rent_min is None or rent_max is None or cursor is None:
             raise ValueError("gu, deposit_min, deposit_max, rent_min, and rent_max are required.")
 
@@ -176,6 +178,8 @@ class MongoDatabase:
             "deposit_fee": {"$gte": deposit_min, "$lte": deposit_max},
             "rent_fee": {"$gte": rent_min, "$lte": rent_max}
         }
+        if dong:
+            base_filter["dong"] = {"$in": dong.split(",")}
 
         if cursor and cursor != "1":
             try:
@@ -203,3 +207,72 @@ class MongoDatabase:
         except Exception as e:
             logger.error(f"쿼리 실패: {e}")
             return {"total_count": 0, "real_estate_list": [], "nextPage": None}
+        
+    def save_estate(self, estate_id: Dict[str, Any]) -> bool:
+        if not estate_id or not isinstance(estate_id, dict):
+            logger.error("Invalid estate_id format")
+            return False
+        
+        try:
+            result = self.article_collection.update_one(
+                {"_id": ObjectId(estate_id["_id"])},
+                {"$set": {"saved": True}}
+            )
+            if result.modified_count > 0:
+                logger.info(f"Estate {estate_id['_id']} saved successfully")
+                return True
+            else:
+                logger.warning(f"Estate {estate_id['_id']} was already saved or not found")
+                return False
+        except Exception as e:
+            logger.error(f"Failed to save estate: {e}")
+            return False
+    
+    def create_folder(self, user_id: str, folder_name: str) -> bool:
+        if not folder_name or not isinstance(folder_name, str):
+            logger.error("Invalid folder_name format")
+            return False
+
+        try:
+            # 유저가 없으면 생성
+            self.user_collection.update_one(
+                {"user_id": user_id},
+                {"$setOnInsert": {"folders": {}}},
+                upsert=True
+            )
+            update_result = self.user_collection.update_one(
+                { "user_id": user_id },
+                { f"$set": { f"folders.{folder_name}": {} } }  # 폴더 이름을 키로 추가
+            )
+
+            if update_result.matched_count == 0:
+                logger.warning(f"User '{user_id}' not found")
+                return False
+
+            if update_result.modified_count > 0:
+                logger.info(f"Folder '{folder_name}' created successfully for user '{user_id}'")
+            else:
+                logger.info(f"Folder '{folder_name}' already exists for user '{user_id}'")
+
+            return True
+        except Exception as e:
+            logger.error(f"Failed to create folder: {e}")
+            return False
+    
+    def get_folder_list(self, user_id: str) -> List[str]:
+        if not user_id or not isinstance(user_id, str):
+            logger.error("Invalid user_id format")
+            return []
+
+        try:
+            user = self.user_collection.find_one({"user_id": user_id}, {"folders": 1, "_id": 0})
+            if not user or "folders" not in user:
+                logger.info(f"No folders found for user '{user_id}'")
+                return []
+
+            folder_list = list(user["folders"].keys())
+            logger.info(f"Retrieved {len(folder_list)} folders for user '{user_id}'")
+            return folder_list
+        except Exception as e:
+            logger.error(f"Failed to get folder list: {e}")
+            return []

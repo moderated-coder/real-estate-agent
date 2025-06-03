@@ -6,7 +6,7 @@ import logging
 import math
 import traceback
 import pandas as pd
-from typing import Dict, Any, List
+from typing import Dict, Any, Optional
 from tqdm import tqdm
 
 from utils.crawl_utils import cookies, headers, extract_total_data_from_html
@@ -252,12 +252,38 @@ class GuService:
             article["_id"] = str(article["_id"])
         return GuService.sanitize(articles)
 
-    def get_articles(self, gu: str, deposit_min: int, deposit_max: int, rent_min: int, rent_max: int, cursor: str):
+    def get_articles(self, gu: str, dong: Optional[str], deposit_min: int, deposit_max: int, rent_min: int, rent_max: int, cursor: str):
         if gu is None or deposit_min is None or deposit_max is None or rent_min is None or rent_max is None or cursor is None:
             raise ValueError("gu, deposit_min, deposit_max, rent_min, and rent_max are required.")
         db = MongoDatabase()
         db.connect()
-        articles = db.get_articles(gu=gu, deposit_min=deposit_min, deposit_max=deposit_max, rent_min=rent_min, rent_max=rent_max,cursor=cursor)
+        articles = db.get_articles(gu=gu, dong=dong, deposit_min=deposit_min, deposit_max=deposit_max, rent_min=rent_min, rent_max=rent_max, cursor=cursor)
         for article in articles['real_estate_list']:
             article["_id"] = str(article["_id"])
         return GuService.sanitize(articles)
+    
+    def save_estate(self, estate_id: Dict[str, Any]):
+        if not estate_id or "id" not in estate_id:
+            raise ValueError("Estate ID is required.")
+        db = MongoDatabase()
+        db.connect()
+        result = db.save_estate(estate_id["id"])
+        return {"status": "success" if result else "fail", "message": "Estate saved successfully." if result else "Failed to save estate."}
+
+    def create_folder(self, user_id: str, folder_name: str):
+        if not user_id:
+            raise ValueError("User ID is required.")
+        if not folder_name:
+            raise ValueError("Folder name is required.")
+        db = MongoDatabase()
+        db.connect()
+        result = db.create_folder(user_id, folder_name)
+        return {"status": "success" if result else "fail", "message": "Folder created successfully." if result else "Failed to create folder."}
+    
+    def get_folder_list(self, user_id: str):
+        if not user_id:
+            raise ValueError("User ID is required.")
+        db = MongoDatabase()
+        db.connect()
+        folder_list = db.get_folder_list(user_id)
+        return {"status": "success", "folders": folder_list} if folder_list else {"status": "fail", "message": "No folders found."}
