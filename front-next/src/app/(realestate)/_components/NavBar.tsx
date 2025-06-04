@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import SearchBar from "./SearchBar";
 import FeeSlider from "./FeeSlider";
@@ -23,7 +23,7 @@ const NavBar = () => {
   const [newFolderName, setNewFolderName] = useState("");
   const router = useRouter();
   const getFolderList = async ({ queryKey }: { queryKey: ["folders", string] }) => {
-    const [_, userId] = queryKey;
+    const [, userId] = queryKey;
     const res = await fetch(`http://localhost:8000/folder/list?user_id=${userId}`, {});
     if (!res.ok) throw new Error("Failed to fetch folders");
     return res.json();
@@ -147,7 +147,6 @@ const NavBar = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: "admin", folder_name: folderName }),
       });
-      console.log(res);
       if (!res.ok) throw new Error("Failed to create folder");
       return folderName;
     },

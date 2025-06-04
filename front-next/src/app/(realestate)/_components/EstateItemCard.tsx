@@ -1,6 +1,7 @@
+"use client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import { Article } from "../page";
+import { Article } from "@/src/app/(realestate)/types/realEstate";
 export default function EstateItemCard({ realEstateList }: { realEstateList: Article[] }) {
   const queryClient = useQueryClient();
 
