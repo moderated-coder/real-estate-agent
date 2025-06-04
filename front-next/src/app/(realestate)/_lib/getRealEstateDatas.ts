@@ -24,7 +24,8 @@ export default async function getRealEstateDatas({
   ];
 }): Promise<RealEstateResponse> {
   const [, { gu, deposit_min, deposit_max, rent_min, rent_max, dong }] = queryKey;
-  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/get_articles`);
+  const url = new URL("/get_articles", process.env.NEXT_PUBLIC_API_URL);
+  console.log(url.toString());
   const multiValueParams = {
     gu,
     dong,
@@ -43,7 +44,7 @@ export default async function getRealEstateDatas({
   });
 
   url.searchParams.append("cursor", pageParam.toString());
-
+  console.log("Fetching real estate listings from:", url.toString());
   const response = await fetch(url.toString(), {
     method: "GET",
     headers: { "Content-Type": "application/json" },
