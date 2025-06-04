@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import SearchBar from "./SearchBar";
 import FeeSlider from "./FeeSlider";
 import SearchLocation from "./SearchLocation";
@@ -173,7 +173,9 @@ const NavBar = () => {
           <Link href="/" className="whitespace-nowrap text-lg font-bold text-blue-600">
             부동산 리스트
           </Link>
-          <SearchBar depositRange={depositRange} monthlyRentRange={monthlyRentRange} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <SearchBar depositRange={depositRange} monthlyRentRange={monthlyRentRange} />
+          </Suspense>
           <nav className="relative flex items-center gap-3 text-sm">
             <button
               className={`px-3 py-1 border w-20 rounded cursor-pointer ${

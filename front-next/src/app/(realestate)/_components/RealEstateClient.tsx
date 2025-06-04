@@ -1,6 +1,6 @@
 "use client";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import EstateItemCard from "./EstateItemCard";
 import getRealEstateDatas from "../_lib/getRealEstateDatas";
@@ -59,7 +59,9 @@ function RealEstateData(props: {
   return (
     <div>
       {allListings.map((item) => (
-        <EstateItemCard key={item._id} realEstateList={[item]} />
+        <Suspense key={item._id} fallback={<p>Loading...</p>}>
+          <EstateItemCard key={item._id} realEstateList={[item]} />
+        </Suspense>
       ))}
       <div ref={observerRef} className="h-10"></div>
       {isFetchingNextPage && <p>Loading more...</p>}
