@@ -1,20 +1,24 @@
 "use client";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Suspense, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import EstateItemCard from "./EstateItemCard";
 import getRealEstateDatas from "../_lib/getRealEstateDatas";
 
-export default function RealEstateClient() {
-  const searchParams = useSearchParams();
-
-  const gu = searchParams.get("gu") ?? "";
-  const dong = searchParams.get("dong") ?? undefined;
-  const deposit_min = searchParams.get("deposit_min") ?? "";
-  const deposit_max = searchParams.get("deposit_max") ?? "";
-  const rent_min = searchParams.get("rent_min") ?? "";
-  const rent_max = searchParams.get("rent_max") ?? "";
-
+export default function RealEstateClient({
+  gu,
+  dong,
+  deposit_min,
+  deposit_max,
+  rent_min,
+  rent_max,
+}: {
+  gu?: string | string[];
+  dong?: string[];
+  deposit_min?: string | string[];
+  deposit_max?: string | string[];
+  rent_min?: string | string[];
+  rent_max?: string | string[];
+}) {
   return (
     <RealEstateData
       gu={gu}
@@ -28,12 +32,12 @@ export default function RealEstateClient() {
 }
 
 function RealEstateData(props: {
-  gu: string;
-  dong?: string;
-  deposit_min: string;
-  deposit_max: string;
-  rent_min: string;
-  rent_max: string;
+  gu?: string | string[];
+  dong?: string[];
+  deposit_min?: string | string[];
+  deposit_max?: string | string[];
+  rent_min?: string | string[];
+  rent_max?: string | string[];
 }) {
   const { gu, dong, deposit_min, deposit_max, rent_min, rent_max } = props;
 

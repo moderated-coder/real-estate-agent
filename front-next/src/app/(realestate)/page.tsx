@@ -10,7 +10,8 @@ export default async function RealEstatePage({ searchParams }: { searchParams: P
   const deposit_max = resolvedSearchParams.deposit_max ? resolvedSearchParams.deposit_max : undefined;
   const rent_min = resolvedSearchParams.rent_min ? resolvedSearchParams.rent_min : undefined;
   const rent_max = resolvedSearchParams.rent_max ? resolvedSearchParams.rent_max : undefined;
-  const dong = resolvedSearchParams.dong ? resolvedSearchParams.dong : undefined;
+  const dongParam = resolvedSearchParams.dong;
+  const dong = dongParam ? (Array.isArray(dongParam) ? dongParam : [dongParam]) : undefined;
   const queryClient = new QueryClient();
   await queryClient.prefetchInfiniteQuery({
     queryKey: ["search", { gu, deposit_min, deposit_max, rent_min, rent_max, dong }],
@@ -27,7 +28,14 @@ export default async function RealEstatePage({ searchParams }: { searchParams: P
     <Suspense fallback={<div>로딩 중...</div>}>
       <HydrationBoundary state={dehydratedState}>
         <main className="max-w-6xl mx-auto px-4 pt-4 pb-10">
-          <RealEstateClient />
+          <RealEstateClient
+            gu={gu}
+            dong={dong}
+            deposit_min={deposit_min}
+            deposit_max={deposit_max}
+            rent_min={rent_min}
+            rent_max={rent_max}
+          />
         </main>
       </HydrationBoundary>
     </Suspense>

@@ -54,6 +54,7 @@ export default function EstateItemCard({ realEstateList }: { realEstateList: Art
                     ))}
               </div>
               <div className="text-xs text-gray-500 mt-2">{item.agent_office_post}</div>
+              <div className="text-xs text-gray-500">{item.dong}</div>
             </div>
             <div>
               <button
