@@ -39,8 +39,6 @@ const SavedPage = () => {
             </div>
           </div>
         ))}
-
-        {/* Summary */}
         <div className="border-t pt-4 flex justify-between items-center">
           <p className="text-sm">
             선택한 매물 <strong>2개</strong>

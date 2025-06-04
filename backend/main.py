@@ -25,10 +25,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  
+    allow_origins=["https://real-estate-front-wwqr-44wagr6cx-lee-gyu-yeols-projects.vercel.app"],
     allow_credentials=True,
-    allow_methods=["*"],  # GET, POST 등 허용할 메서드
-    allow_headers=["*"],  # Authorization, Content-Type 등
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 gu_service = GuService()
 article_read_service = ArticleReadService()

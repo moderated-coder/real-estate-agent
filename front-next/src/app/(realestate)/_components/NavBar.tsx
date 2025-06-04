@@ -24,7 +24,7 @@ const NavBar = () => {
   const router = useRouter();
   const getFolderList = async ({ queryKey }: { queryKey: ["folders", string] }) => {
     const [, userId] = queryKey;
-    const res = await fetch(`http://localhost:8000/folder/list?user_id=${userId}`, {});
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folder/list?user_id=${userId}`, {});
     if (!res.ok) throw new Error("Failed to fetch folders");
     return res.json();
   };
@@ -142,7 +142,7 @@ const NavBar = () => {
 
   const createFolderMutation = useMutation({
     mutationFn: async (folderName: string) => {
-      const res = await fetch("http://localhost:8000/folder/create", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folder/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: "admin", folder_name: folderName }),

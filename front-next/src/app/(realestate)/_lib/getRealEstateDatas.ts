@@ -24,7 +24,7 @@ export default async function getRealEstateDatas({
   ];
 }): Promise<RealEstateResponse> {
   const [, { gu, deposit_min, deposit_max, rent_min, rent_max, dong }] = queryKey;
-  const url = new URL("http://localhost:8000/get_articles");
+  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/get_articles`);
   const multiValueParams = {
     gu,
     dong,

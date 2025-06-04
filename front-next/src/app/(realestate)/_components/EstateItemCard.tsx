@@ -6,7 +6,7 @@ export default function EstateItemCard({ realEstateList }: { realEstateList: Art
   const queryClient = useQueryClient();
 
   const saveEstate = async (_id: string) => {
-    const res = await fetch("http://localhost:8000/save/estate", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/save/estate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ estateId: _id }),
