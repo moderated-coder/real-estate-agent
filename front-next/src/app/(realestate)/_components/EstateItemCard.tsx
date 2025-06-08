@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { Article } from "@/src/app/(realestate)/types/realEstate";
-export default function EstateItemCard({ realEstateList }: { realEstateList: Article[] }) {
+export default function EstateItemCard({ realEstate }: { realEstate: Article }) {
   const queryClient = useQueryClient();
 
   const saveEstate = async (_id: string) => {
@@ -30,46 +30,48 @@ export default function EstateItemCard({ realEstateList }: { realEstateList: Art
   const saveRealEstateItem = (_id: string) => {
     mutate(_id);
   };
+
   return (
-    <div>
-      {realEstateList?.map((item) => (
-        <div key={item._id} className="flex border p-4 mb-3 rounded bg-white shadow">
+    console.log(Array.from(realEstate.article_short_features).map),
+    (
+      <div>
+        <div key={realEstate._id} className="flex border p-4 mb-3 rounded bg-white shadow">
           <div className="flex flex-col justify-between w-600 ">
             <div>
-              <div className="font-semibold">{item.article_title}</div>
+              <div className="font-semibold">{realEstate.article_title}</div>
               <div className="text-sm text-gray-600">
-                보증금 {item.deposit_fee} / 월세 {item.rent_fee}
+                보증금 {realEstate.deposit_fee} / 월세 {realEstate.rent_fee}
               </div>
               <div className="flex gap-2 text-xs mt-2">
-                {item.article_short_features === "None"
+                {realEstate.article_short_features === "None"
                   ? [].map((tag) => (
                       <span key={tag} className="bg-gray-100 px-2 py-1 rounded">
                         {tag}
                       </span>
                     ))
-                  : item.article_short_features.map((tag) => (
+                  : realEstate.article_short_features.map((tag) => (
                       <span key={tag} className="bg-gray-100 px-2 py-1 rounded">
                         {tag}
                       </span>
                     ))}
               </div>
-              <div className="text-xs text-gray-500 mt-2">{item.agent_office_post}</div>
-              <div className="text-xs text-gray-500">{item.dong}</div>
+              <div className="text-xs text-gray-500 mt-2">{realEstate.agent_office_post}</div>
+              <div className="text-xs text-gray-500">{realEstate.dong}</div>
             </div>
             <div>
               <button
                 className="bg-blue-600 text-sm text-white px-2 py-1 rounded cursor-pointer"
-                onClick={() => saveRealEstateItem(item._id)}
+                onClick={() => saveRealEstateItem(realEstate._id)}
               >
                 리스트에 추가
               </button>
             </div>
           </div>
-          <div className="flex justify-center items-center w-full h-48 overflow-hidden bg-gray-100 rounded">
-            {item.image_url ? (
+          <div className="flex justify-center realEstates-center w-full h-48 overflow-hidden bg-gray-100 rounded">
+            {realEstate.image_url ? (
               <Image
-                src={"https://landthumb-phinf.pstatic.net" + item.image_url}
-                alt={item.article_title}
+                src={"https://landthumb-phinf.pstatic.net" + realEstate.image_url}
+                alt={realEstate.article_title}
                 width={200}
                 height={150}
                 className="object-contain"
@@ -79,7 +81,7 @@ export default function EstateItemCard({ realEstateList }: { realEstateList: Art
             )}
           </div>
         </div>
-      ))}
-    </div>
+      </div>
+    )
   );
 }

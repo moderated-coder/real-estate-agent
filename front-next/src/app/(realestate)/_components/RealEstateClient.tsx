@@ -59,12 +59,11 @@ function RealEstateData(props: {
   }, [fetchNextPage, hasNextPage]);
 
   const allListings = data?.pages.flatMap((page) => page.real_estate_list) ?? [];
-
   return (
     <div>
       {allListings.map((item) => (
         <Suspense key={item._id} fallback={<p>Loading...</p>}>
-          <EstateItemCard key={item._id} realEstateList={[item]} />
+          <EstateItemCard key={item._id} realEstate={item} />
         </Suspense>
       ))}
       <div ref={observerRef} className="h-10"></div>
