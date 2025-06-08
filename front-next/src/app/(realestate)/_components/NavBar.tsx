@@ -11,8 +11,8 @@ const NavBar = () => {
   const navRef = useRef<HTMLDivElement>(null);
   const [showSlider, setShowSlider] = useState(false);
   const [showSearchLocation, setShowSearchLocation] = useState(true);
-  const [depositRange, setDepositRange] = useState<[number, number]>([0, 100000000]);
-  const [monthlyRentRange, setMonthlyRentRange] = useState<[number, number]>([0, 500]);
+  const [depositRange, setDepositRange] = useState<[number, number]>([0, Infinity]);
+  const [monthlyRentRange, setMonthlyRentRange] = useState<[number, number]>([0, Infinity]);
   const [step, setStep] = useState<"city" | "gu" | "dong">("city");
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [selectedGu, setSelectedGu] = useState<string | null>(null);
@@ -33,7 +33,33 @@ const NavBar = () => {
     queryFn: getFolderList,
   });
   const guMap: { [city: string]: string[] } = {
-    서울시: ["영등포구"],
+    서울시: [
+      "강남구",
+      "강동구",
+      "강북구",
+      "강서구",
+      "관악구",
+      "광진구",
+      "구로구",
+      "금천구",
+      "노원구",
+      "도봉구",
+      "동대문구",
+      "동작구",
+      "마포구",
+      "서대문구",
+      "서초구",
+      "성동구",
+      "성북구",
+      "송파구",
+      "양천구",
+      "영등포구",
+      "용산구",
+      "은평구",
+      "종로구",
+      "중구",
+      "중랑구",
+    ],
   };
   const dongMap: { [gu: string]: string[] } = {
     영등포구: [
