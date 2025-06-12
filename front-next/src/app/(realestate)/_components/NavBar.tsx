@@ -1,66 +1,63 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useRef, Suspense } from "react";
-import SearchBar from "./SearchBar";
-import FeeSlider from "./FeeSlider";
-import SearchLocation from "./SearchLocation";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useState, useEffect, useRef } from "react";
+// import SearchBar from "./SearchBar";
+import DepositAndRentInput from "./DepositAndRentInput";
+import SelectLocation from "./SelectLocation";
+// import { getFolderList } from "@/src/lib/api";
+// import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+// import NavAction from "./NavAction";
 
 const NavBar = () => {
   const navRef = useRef<HTMLDivElement>(null);
-  const [showSlider, setShowSlider] = useState(false);
-  const [showSearchLocation, setShowSearchLocation] = useState(true);
+  // const [showSlider, setShowSlider] = useState(false);
+  // const [showSearchLocation, setShowSearchLocation] = useState(true);
   const [depositRange, setDepositRange] = useState<[number, number]>([0, Infinity]);
   const [monthlyRentRange, setMonthlyRentRange] = useState<[number, number]>([0, Infinity]);
-  const [step, setStep] = useState<"city" | "gu" | "dong">("city");
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
-  const [selectedGu, setSelectedGu] = useState<string | null>(null);
+  // const [step, setStep] = useState<"city" | "gu" | "dong">("city");
+  // const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  // const [selectedGu, setSelectedGu] = useState<string | null>(null);
   const [selectedDong, setSelectedDong] = useState<Set<string>>(new Set());
-  const [showSearchFilter, setShowSearchFilter] = useState(false);
-  const [showFolderSelect, setShowFolderSelect] = useState(false);
-  const [isAddingFolder, setIsAddingFolder] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("");
+  // const [showSearchFilter, setShowSearchFilter] = useState(false);
+  // const [showFolderSelect, setShowFolderSelect] = useState(false);
+  // const [isAddingFolder, setIsAddingFolder] = useState(false);
+  // const [newFolderName, setNewFolderName] = useState("");
   const router = useRouter();
-  const getFolderList = async ({ queryKey }: { queryKey: ["folders", string] }) => {
-    const [, userId] = queryKey;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folder/list?user_id=${userId}`, {});
-    if (!res.ok) throw new Error("Failed to fetch folders");
-    return res.json();
-  };
-  const { data: folders } = useQuery({
-    queryKey: ["folders", "admin"],
-    queryFn: getFolderList,
-  });
-  const guMap: { [city: string]: string[] } = {
-    서울시: [
-      "강남구",
-      "강동구",
-      "강북구",
-      "강서구",
-      "관악구",
-      "광진구",
-      "구로구",
-      "금천구",
-      "노원구",
-      "도봉구",
-      "동대문구",
-      "동작구",
-      "마포구",
-      "서대문구",
-      "서초구",
-      "성동구",
-      "성북구",
-      "송파구",
-      "양천구",
-      "영등포구",
-      "용산구",
-      "은평구",
-      "종로구",
-      "중구",
-      "중랑구",
-    ],
-  };
+
+  // const { data: folders } = useQuery({
+  //   queryKey: ["folders", "admin"],
+  //   queryFn: getFolderList,
+  // });
+  // const guMap: { [city: string]: string[] } = {
+  //   서울시: [
+  //     "강남구",
+  //     "강동구",
+  //     "강북구",
+  //     "강서구",
+  //     "관악구",
+  //     "광진구",
+  //     "구로구",
+  //     "금천구",
+  //     "노원구",
+  //     "도봉구",
+  //     "동대문구",
+  //     "동작구",
+  //     "마포구",
+  //     "서대문구",
+  //     "서초구",
+  //     "성동구",
+  //     "성북구",
+  //     "송파구",
+  //     "양천구",
+  //     "영등포구",
+  //     "용산구",
+  //     "은평구",
+  //     "종로구",
+  //     "중구",
+  //     "중랑구",
+  //   ],
+  // };
   const dongMap: { [gu: string]: string[] } = {
     영등포구: [
       "당산동",
@@ -98,214 +95,130 @@ const NavBar = () => {
       "영등포동8가",
     ],
   };
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const depositMin = params.get("deposit_min");
-    const depositMax = params.get("deposit_max");
-    const rentMin = params.get("rent_min");
-    const rentMax = params.get("rent_max");
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent) => {
+  //     if (navRef.current && !navRef.current.contains(event.target as Node)) {
+  //       setShowSearchFilter(false);
+  //       setShowFolderSelect(false);
+  //     }
+  //   };
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, []);
 
-    if (depositMin && depositMax) {
-      setDepositRange([Number(depositMin), Number(depositMax)]);
-    }
-    if (rentMin && rentMax) {
-      setMonthlyRentRange([Number(rentMin), Number(rentMax)]);
-    }
-  }, []);
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(event.target as Node)) {
-        setShowSearchFilter(false);
-        setShowFolderSelect(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-  const searchRealEstate = () => {
     const params = new URLSearchParams();
-    params.set("deposit_min", depositRange[0].toString());
-    params.set("deposit_max", depositRange[1].toString());
-    params.set("rent_min", monthlyRentRange[0].toString());
-    params.set("rent_max", monthlyRentRange[1].toString());
-    if (selectedGu) {
-      params.set("gu", selectedGu);
-    }
     if (selectedDong.size > 0) {
-      params.set("dong", Array.from(selectedDong).join(","));
+      params.set("gu", "영등포구");
+      params.set("dong", [...selectedDong].join(","));
+      params.set("deposit_min", depositRange[0].toString());
+      if (monthlyRentRange[1] !== Infinity) {
+        params.set("rent_max", monthlyRentRange[1].toString());
+      }
+      params.set("rent_min", monthlyRentRange[0].toString());
+      if (depositRange[1] !== Infinity) {
+        params.set("deposit_max", depositRange[1].toString());
+      }
     }
     router.replace(`/?${params.toString()}`);
-  };
+  }, [selectedDong, depositRange, monthlyRentRange]);
 
-  const queryClient = useQueryClient();
+  // const searchRealEstate = () => {
+  //   const params = new URLSearchParams();
+  //   params.set("deposit_min", depositRange[0].toString());
+  //   params.set("deposit_max", depositRange[1].toString());
+  //   params.set("rent_min", monthlyRentRange[0].toString());
+  //   params.set("rent_max", monthlyRentRange[1].toString());
+  //   if (selectedGu) {
+  //     params.set("gu", selectedGu);
+  //   }
+  //   if (selectedDong.size > 0) {
+  //     params.set("dong", Array.from(selectedDong).join(","));
+  //   }
+  //   router.replace(`/?${params.toString()}`);
+  // };
 
-  const createFolderMutation = useMutation({
-    mutationFn: async (folderName: string) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folder/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: "admin", folder_name: folderName }),
-      });
-      if (!res.ok) throw new Error("Failed to create folder");
-      return folderName;
-    },
-    onMutate: async (newFolderName) => {
-      await queryClient.cancelQueries({ queryKey: ["folders", "admin"] });
-      const previousFolders = queryClient.getQueryData<string[]>(["folders", "admin"]) ?? [];
-      queryClient.setQueryData(["folders", "admin"], (old: string[] = []) => [...old, newFolderName]);
-      return { previousFolders };
-    },
-    onError: (_err, _newFolderName, context) => {
-      if (context?.previousFolders) {
-        queryClient.setQueryData(["folders", "admin"], context.previousFolders);
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["folders", "admin"] });
-    },
-  });
+  // const queryClient = useQueryClient();
+
+  // const createFolderMutation = useMutation({
+  //   mutationFn: async (folderName: string) => {
+  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folder/create`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ user_id: "admin", folder_name: folderName }),
+  //     });
+  //     if (!res.ok) throw new Error("Failed to create folder");
+  //     return folderName;
+  //   },
+  //   onMutate: async (newFolderName) => {
+  //     await queryClient.cancelQueries({ queryKey: ["folders", "admin"] });
+  //     const previousFolders = queryClient.getQueryData<{ folders: string[] }>(["folders", "admin"]) ?? { folders: [] };
+  //     queryClient.setQueryData(["folders", "admin"], (old: { folders: string[] } = { folders: [] }) => ({
+  //       folders: [...old.folders, newFolderName],
+  //     }));
+  //     return { previousFolders };
+  //   },
+  //   onError: (_err, _newFolderName, context) => {
+  //     if (context?.previousFolders) {
+  //       queryClient.setQueryData(["folders", "admin"], context.previousFolders);
+  //     }
+  //   },
+  //   onSettled: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["folders", "admin"] });
+  //   },
+  // });
 
   return (
     <div ref={navRef}>
-      <header className="sticky top-0 z-50 w-full bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <header className="min-w-[555px] w-full bg-white shadow-sm border-b">
+        <div className="mx-auto px-4 py-1 flex items-center justify-between gap-4">
           <Link href="/" className="whitespace-nowrap text-lg font-bold text-blue-600">
             부동산 리스트
           </Link>
-          <Suspense fallback={<div>Loading...</div>}>
+          {/* <Suspense fallback={<div>Loading...</div>}>
             <SearchBar depositRange={depositRange} monthlyRentRange={monthlyRentRange} />
           </Suspense>
-          <nav className="relative flex items-center gap-3 text-sm">
-            <button
-              className={`px-3 py-1 border w-20 rounded cursor-pointer ${
-                showSearchFilter ? "bg-blue-500 text-white" : "bg-white text-gray-700 hover:bg-gray-100"
-              } transition`}
-              onClick={() => {
-                setShowFolderSelect(false);
-                setShowSearchFilter((prev) => !prev);
-              }}
-            >
-              검색 조건
-            </button>
-            {showSearchFilter && (
-              <div className="absolute right-0 top-[50px] flex flex-col items-center gap-2 bg-white border rounded-lg px-3 py-1">
-                <div className="flex gap-3 py-2 w-full justify-center  bg-white rounded-t-md">
-                  <button
-                    className={`px-4 py-2 text-sm w-full font-medium border border-gray-300 rounded-md transition cursor-pointer ${
-                      showSearchLocation ? "bg-blue-500 text-white" : "bg-white text-gray-700 hover:bg-gray-100"
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowSearchLocation(true);
-                      setShowSlider(false);
-                    }}
-                  >
-                    지역 찾기
-                  </button>
-                  <button
-                    className={`px-4 py-2 text-sm w-full font-medium border border-gray-300 rounded-md transition cursor-pointer ${
-                      showSlider ? "bg-blue-500 text-white" : "bg-white text-gray-700 hover:bg-gray-100"
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowSlider(true);
-                      setShowSearchLocation(false);
-                    }}
-                  >
-                    보증금 설정
-                  </button>
-                </div>
+          <NavAction
+            showSearchFilter={showSearchFilter}
+            setShowSearchFilter={setShowSearchFilter}
+            showFolderSelect={showFolderSelect}
+            setShowFolderSelect={setShowFolderSelect}
+            showSlider={showSlider}
+            setShowSlider={setShowSlider}
+            showSearchLocation={showSearchLocation}
+            setShowSearchLocation={setShowSearchLocation}
+            step={step}
+            setStep={setStep}
+            selectedCity={selectedCity}
+            setSelectedCity={setSelectedCity}
+            selectedGu={selectedGu}
+            setSelectedGu={setSelectedGu}
+            selectedDong={selectedDong}
+            setSelectedDong={setSelectedDong}
+            guMap={guMap}
+            dongMap={dongMap}
+            searchRealEstate={searchRealEstate}
+            depositRange={depositRange}
+            setDepositRange={setDepositRange}
+            monthlyRentRange={monthlyRentRange}
+            setMonthlyRentRange={setMonthlyRentRange}
+            folders={folders}
+            isAddingFolder={isAddingFolder}
+            setIsAddingFolder={setIsAddingFolder}
+            newFolderName={newFolderName}
+            setNewFolderName={setNewFolderName}
+            createFolderMutation={createFolderMutation}
+          /> */}
+        </div>
+        <div className="mx-auto px-4 py-2 flex gap-2">
+          <SelectLocation selectedDong={selectedDong} setSelectedDong={setSelectedDong} dongMap={dongMap} />
 
-                {showSlider && (
-                  <FeeSlider
-                    depositRange={depositRange}
-                    setDepositRange={setDepositRange}
-                    monthlyRentRange={monthlyRentRange}
-                    setMonthlyRentRange={setMonthlyRentRange}
-                  />
-                )}
-                {showSearchLocation && (
-                  <SearchLocation
-                    step={step}
-                    setStep={setStep}
-                    selectedCity={selectedCity}
-                    setSelectedCity={setSelectedCity}
-                    selectedGu={selectedGu}
-                    setSelectedGu={setSelectedGu}
-                    selectedDong={selectedDong}
-                    setSelectedDong={setSelectedDong}
-                    guMap={guMap}
-                    dongMap={dongMap}
-                    searchRealEstate={searchRealEstate}
-                    setShowFilter={setShowSearchFilter}
-                  />
-                )}
-              </div>
-            )}
-            <button
-              className={`px-3 py-1 border w-20 rounded cursor-pointer ${
-                showFolderSelect ? "bg-blue-500 text-white" : "bg-white text-gray-700 hover:bg-gray-100"
-              } transition`}
-              onClick={() => {
-                setShowSearchFilter(false);
-                setShowFolderSelect((prev) => !prev);
-              }}
-            >
-              폴더 선택
-            </button>
-            {showFolderSelect && (
-              <div className="absolute right-0 top-[50px] w-48 flex flex-col gap-2 bg-white border rounded-lg px-3 py-2 shadow-md">
-                {folders &&
-                  folders?.folders.map((folder: string, index: number) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm text-gray-800">{folder}</span>
-                      <button className="text-xs text-red-500 hover:underline">삭제</button>
-                    </div>
-                  ))}
-                {isAddingFolder ? (
-                  <div className="flex flex-col gap-2 mt-2">
-                    <input
-                      type="text"
-                      value={newFolderName}
-                      onChange={(e) => setNewFolderName(e.target.value)}
-                      placeholder="폴더 이름"
-                      className="border px-2 py-1 text-sm rounded"
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        className="text-sm text-white bg-blue-500 rounded px-2 py-1 hover:bg-blue-600"
-                        onClick={async () => {
-                          if (!newFolderName.trim()) return;
-                          createFolderMutation.mutate(newFolderName);
-                          setNewFolderName("");
-                          setIsAddingFolder(false);
-                        }}
-                      >
-                        생성
-                      </button>
-                      <button
-                        className="text-sm text-gray-600 bg-gray-100 rounded px-2 py-1 hover:bg-gray-200"
-                        onClick={() => {
-                          setIsAddingFolder(false);
-                          setNewFolderName("");
-                        }}
-                      >
-                        취소
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    className="mt-2 px-2 py-1 text-sm text-white bg-blue-500 rounded hover:bg-blue-600"
-                    onClick={() => setIsAddingFolder(true)}
-                  >
-                    새 폴더 추가
-                  </button>
-                )}
-              </div>
-            )}
-          </nav>
+          <DepositAndRentInput
+            depositRange={depositRange}
+            setDepositRange={setDepositRange}
+            monthlyRentRange={monthlyRentRange}
+            setMonthlyRentRange={setMonthlyRentRange}
+          />
         </div>
       </header>
     </div>
