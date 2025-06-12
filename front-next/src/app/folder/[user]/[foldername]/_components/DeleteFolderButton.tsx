@@ -10,7 +10,7 @@ const DeleteFolderButton = ({ user, foldername }: Props) => {
   const queryClient = new QueryClient();
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/folder/delete/${user}/${foldername}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folder/delete/${user}/${foldername}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });

@@ -85,7 +85,7 @@ export default function Map() {
     });
 
     const fetchAndRenderMarkers = async () => {
-      const res = await fetch(`/api/properties?lat=${mLat}&lng=${mLng}&zoom=${mZoom}`);
+      const res = await fetch(`/properties?lat=${mLat}&lng=${mLng}&zoom=${mZoom}`);
       const data = await res.json();
 
       markersRef.current.forEach((m) => m.setMap(null));

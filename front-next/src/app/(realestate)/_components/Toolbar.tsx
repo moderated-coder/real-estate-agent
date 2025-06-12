@@ -34,7 +34,7 @@ const Toolbar = ({
 
   const createFolderMutation = useMutation({
     mutationFn: async (folderName: string) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/folder/create`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folder/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: "admin", folder_name: folderName }),

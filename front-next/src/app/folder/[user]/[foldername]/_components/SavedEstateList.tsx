@@ -20,7 +20,7 @@ const SavedEstateList = ({ user, foldername }: Props) => {
     queryFn: async ({ queryKey }) => {
       const [, user_id, folder_name] = queryKey;
       console.log(`Fetching folder: ${folder_name} for user: ${user_id}`); // 디버깅을 위해 로깅 추가
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/folder/${user_id}/${folder_name}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folder/${user_id}/${folder_name}`);
       if (!res.ok) {
         throw new Error(`Failed to fetch saved estates: ${res.statusText}`);
       }
@@ -32,7 +32,7 @@ const SavedEstateList = ({ user, foldername }: Props) => {
 
   const deleteEstateMutation = useMutation({
     mutationFn: async ({ folderName, estateId }: { folderName: string; estateId: string }) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/folder/remove-estate`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folder/remove-estate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user, folder_name: folderName, estate_id: estateId }),
