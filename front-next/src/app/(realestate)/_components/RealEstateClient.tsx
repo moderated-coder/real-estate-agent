@@ -23,7 +23,7 @@ export default function RealEstateClient({
   rent_max?: string;
 }) {
   const [selectedEstateIds, setSelectedEstateIds] = useState<Set<string>>(new Set());
-
+  const [isPending, setIsPending] = useState(true);
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = useInfiniteQuery({
     queryKey: ["search", { gu, deposit_min, deposit_max, rent_min, rent_max, dong }] as const,
     queryFn: ({ pageParam = "1", queryKey }) => {
@@ -35,6 +35,12 @@ export default function RealEstateClient({
     staleTime: 1000 * 60 * 5,
     placeholderData: (prevData) => prevData,
   });
+
+  useEffect(() => {
+    if (data) {
+      setIsPending(false);
+    }
+  }, [data]);
 
   const allListings = data?.pages.flatMap((page) => page.real_estate_list) ?? [];
 

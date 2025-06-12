@@ -37,7 +37,7 @@ export default function EstateItemCard({ realEstate, isSelected, onSelect }: Est
             <div className="text-sm text-gray-600">
               보증금 {realEstate.deposit_fee} / 월세 {realEstate.rent_fee}
             </div>
-            <div className="flex gap-2 text-xs mt-2">
+            {/* <div className="flex gap-2 text-xs mt-2">
               {realEstate.article_short_features === "None"
                 ? []
                 : realEstate.article_short_features.map((tag) => (
@@ -45,7 +45,7 @@ export default function EstateItemCard({ realEstate, isSelected, onSelect }: Est
                       {tag}
                     </span>
                   ))}
-            </div>
+            </div> */}
             <div className="text-xs text-gray-500 mt-2">{realEstate.agent_office_post}</div>
             <div className="text-xs text-gray-500">{realEstate.dong}</div>
           </div>

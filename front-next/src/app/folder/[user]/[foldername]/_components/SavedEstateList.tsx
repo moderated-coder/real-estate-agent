@@ -20,7 +20,7 @@ const SavedEstateList = ({ user, foldername }: Props) => {
     queryFn: async ({ queryKey }) => {
       const [, user_id, folder_name] = queryKey;
       console.log(`Fetching folder: ${folder_name} for user: ${user_id}`); // 디버깅을 위해 로깅 추가
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folder/${user_id}/${folder_name}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/folder/${user_id}/${folder_name}`);
       if (!res.ok) {
         throw new Error(`Failed to fetch saved estates: ${res.statusText}`);
       }
@@ -32,7 +32,7 @@ const SavedEstateList = ({ user, foldername }: Props) => {
 
   const deleteEstateMutation = useMutation({
     mutationFn: async ({ folderName, estateId }: { folderName: string; estateId: string }) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folder/remove-estate`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/folder/remove-estate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user, folder_name: folderName, estate_id: estateId }),
@@ -73,7 +73,7 @@ const SavedEstateList = ({ user, foldername }: Props) => {
               <div className="text-sm text-gray-600">
                 보증금 {realEstate.deposit_fee} / 월세 {realEstate.rent_fee}
               </div>
-              <div className="flex gap-2 text-xs mt-2">
+              {/* <div className="flex gap-2 text-xs mt-2">
                 {realEstate.article_short_features === "None"
                   ? []
                   : realEstate.article_short_features.map((tag) => (
@@ -81,7 +81,7 @@ const SavedEstateList = ({ user, foldername }: Props) => {
                         {tag}
                       </span>
                     ))}
-              </div>
+              </div> */}
               <div className="text-xs text-gray-500 mt-2">{realEstate.agent_office_post}</div>
               <div className="text-xs text-gray-500">{realEstate.dong}</div>
             </div>

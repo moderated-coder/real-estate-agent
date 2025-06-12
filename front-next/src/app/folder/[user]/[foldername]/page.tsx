@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import SavedEstateList from "./_components/SavedEstateList";
 import DeleteFolderButton from "./_components/DeleteFolderButton";
 const FolderPage = async ({ params }: { params: Promise<{ user: string; foldername: string }> }) => {

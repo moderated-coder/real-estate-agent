@@ -52,7 +52,7 @@ async def get_article(filter_condition_list: Dict[str, Any]):
 async def test_get_dongname_list(guname: str):
     return gu_service._get_dongname_unit_code_list(guname)
 
-@app.get("/get_articles")
+@app.get("/api/get_articles")
 async def get_articles(
     gu: str = Query(..., description="정렬 기준 (예: deposit_fee_asc)"),
     dong: Optional[str] = Query(None, description="동 이름 (선택 사항)"),
@@ -73,23 +73,23 @@ async def get_articles(
         cursor=cursor,
     )
 
-@app.post("/folder/create")
+@app.post("/api/folder/create")
 async def create_folder(user_id: str = Body(..., description="사용자 ID"), folder_name: str = Body(..., description="생성할 폴더 이름")):
     return gu_service.create_folder(user_id, folder_name)
 
-@app.get("/folder/list")
+@app.get("/api/folder/list")
 async def get_folder_list(user_id: str = Query(..., description="사용자 ID")):
     return gu_service.get_folder_list(user_id)
 
-@app.post("/folder/add-estate")
+@app.post("/api/folder/add-estate")
 async def add_estate_to_folder(user_id: str = Body(..., description="사용자 ID"), folder_name: str = Body(..., description="폴더 이름"), estate_ids: list[str] = Body(..., description="부동산 ID")):
     return gu_service.add_estate_to_folder(user_id, folder_name, estate_ids)
 
-@app.get("/folder/{user_id}/{folder_name}")
+@app.get("/api/folder/{user_id}/{folder_name}")
 async def get_estates_in_folder(user_id: str, folder_name: str):
     return gu_service.get_estates_in_folder(user_id, folder_name)
 
-@app.post("/folder/remove-estate")
+@app.post("/api/folder/remove-estate")
 async def remove_estate_from_folder(
     user_id: str = Body(..., description="사용자 ID"),
     folder_name: str = Body(..., description="폴더 이름"),
@@ -97,7 +97,7 @@ async def remove_estate_from_folder(
 ):
     return gu_service.remove_estate_from_folder(user_id, folder_name, estate_id)
 
-@app.delete("/folder/delete/{user_id}/{folder_name}")
+@app.delete("/api/folder/delete/{user_id}/{folder_name}")
 async def delete_folder(user_id: str, folder_name: str):
     return gu_service.delete_folder(user_id, folder_name)
 
