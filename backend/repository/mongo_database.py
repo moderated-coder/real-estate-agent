@@ -170,14 +170,19 @@ class MongoDatabase:
             return []
 
     def get_articles(self,  gu: str, dong: Optional[str], deposit_min: int = None, deposit_max: int = None, rent_min: int = None, rent_max: int = None, cursor: str = None) -> List[Dict[str, Any]]:
-        if gu is None or deposit_min is None or deposit_max is None or rent_min is None or rent_max is None or cursor is None:
-            raise ValueError("gu, deposit_min, deposit_max, rent_min, and rent_max are required.")
+        if gu is None or deposit_min is None or rent_min is None or cursor is None:
+            raise ValueError("gu, deposit_min, rent_min, and cursor are required.")
 
         base_filter = {
             "gu": {"$in": [gu]},
-            "deposit_fee": {"$gte": deposit_min, "$lte": deposit_max},
-            "rent_fee": {"$gte": rent_min, "$lte": rent_max}
+            "deposit_fee": {"$gte": deposit_min},
+            "rent_fee": {"$gte": rent_min}
         }
+        if deposit_max is not None:
+            base_filter["deposit_fee"]["$lte"] = deposit_max
+        if rent_max is not None:
+            base_filter["rent_fee"] = {"$gte": rent_min, "$lte": rent_max}
+
         if dong:
             base_filter["dong"] = {"$in": dong.split(",")}
 
@@ -208,25 +213,6 @@ class MongoDatabase:
             logger.error(f"쿼리 실패: {e}")
             return {"total_count": 0, "real_estate_list": [], "nextPage": None}
         
-    def save_estate(self, estate_id: Dict[str, Any]) -> bool:
-        if not estate_id or not isinstance(estate_id, dict):
-            logger.error("Invalid estate_id format")
-            return False
-        
-        try:
-            result = self.article_collection.update_one(
-                {"_id": ObjectId(estate_id["_id"])},
-                {"$set": {"saved": True}}
-            )
-            if result.modified_count > 0:
-                logger.info(f"Estate {estate_id['_id']} saved successfully")
-                return True
-            else:
-                logger.warning(f"Estate {estate_id['_id']} was already saved or not found")
-                return False
-        except Exception as e:
-            logger.error(f"Failed to save estate: {e}")
-            return False
     
     def create_folder(self, user_id: str, folder_name: str) -> bool:
         if not folder_name or not isinstance(folder_name, str):
@@ -276,3 +262,108 @@ class MongoDatabase:
         except Exception as e:
             logger.error(f"Failed to get folder list: {e}")
             return []
+    
+    def add_estate_to_folder(self, user_id: str, folder_name: str, estate_ids: List[str]) -> bool:
+        if not user_id or not folder_name or not estate_ids:
+            logger.error("Invalid input parameters")
+            return False
+
+        try:
+
+            update_result = self.user_collection.update_one(
+                { "user_id": user_id, f"folders.{folder_name}": { "$exists": True } },
+                { "$addToSet": { f"folders.{folder_name}.estate_ids": { "$each": estate_ids } } }
+            )
+            if update_result.matched_count == 0:
+                logger.warning(f"User '{user_id}' or folder '{folder_name}' not found")
+                return False
+
+            if update_result.modified_count > 0:
+                logger.info(f"Added estates to folder '{folder_name}' for user '{user_id}'")
+            else:
+                logger.info(f"Estates already exist in folder '{folder_name}' for user '{user_id}'")
+
+            return True
+        except Exception as e:
+            logger.error(f"Failed to add estates to folder: {e}")
+            return False
+        
+    def get_estates_in_folder(self, user_id: str, folder_name: str) -> List[Dict]:
+        if not user_id or not folder_name:
+            logger.error("Invalid user_id or folder_name format")
+            return []
+
+        try:
+            user = self.user_collection.find_one(
+                { "user_id": user_id, f"folders.{folder_name}": { "$exists": True } },
+                { f"folders.{folder_name}.estate_ids": 1, "_id": 0 }
+            )
+            if not user:
+                logger.info(f"No estates found in folder '{folder_name}' for user '{user_id}'")
+                return []
+
+            estate_ids = user.get("folders", {}).get(folder_name, {}).get("estate_ids", [])
+            if not estate_ids:
+                return []
+
+            estate_ids = [ObjectId(eid) for eid in estate_ids if ObjectId.is_valid(eid)]
+        
+            real_estate_list = list(
+                self.article_collection.find({ "_id": { "$in": estate_ids } }).sort("_id", -1)
+            )
+
+            logger.info(f"Retrieved {len(real_estate_list)} estates from folder '{folder_name}' for user '{user_id}'")
+            return real_estate_list
+        except Exception as e:
+            logger.error(f"Failed to get estates in folder: {e}")
+            return []
+        
+    def remove_estate_from_folder(self, user_id: str, folder_name: str, estate_id: str) -> bool:
+        if not user_id or not folder_name or not estate_id:
+            logger.error("Invalid input parameters")
+            return False
+
+        try:
+            update_result = self.user_collection.update_one(
+                { "user_id": user_id, f"folders.{folder_name}": { "$exists": True } },
+                { "$pull": { f"folders.{folder_name}.estate_ids": estate_id } }
+            )
+
+            if update_result.matched_count == 0:
+                logger.warning(f"User '{user_id}' or folder '{folder_name}' not found")
+                return False
+
+            if update_result.modified_count > 0:
+                logger.info(f"Removed estate '{estate_id}' from folder '{folder_name}' for user '{user_id}'")
+            else:
+                logger.info(f"Estate '{estate_id}' not found in folder '{folder_name}' for user '{user_id}'")
+
+            return True
+        except Exception as e:
+            logger.error(f"Failed to remove estate from folder: {e}")
+            return False
+        
+    def delete_folder(self, user_id: str, folder_name: str) -> bool:
+        if not user_id or not folder_name:
+            logger.error("Invalid user_id or folder_name format")
+            return False
+
+        try:
+            update_result = self.user_collection.update_one(
+                { "user_id": user_id },
+                { "$unset": { f"folders.{folder_name}": "" } }
+            )
+
+            if update_result.matched_count == 0:
+                logger.warning(f"User '{user_id}' not found")
+                return False
+
+            if update_result.modified_count > 0:
+                logger.info(f"Deleted folder '{folder_name}' for user '{user_id}'")
+            else:
+                logger.info(f"Folder '{folder_name}' does not exist for user '{user_id}'")
+
+            return True
+        except Exception as e:
+            logger.error(f"Failed to delete folder: {e}")
+            return False

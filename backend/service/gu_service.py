@@ -8,7 +8,6 @@ import traceback
 import pandas as pd
 from typing import Dict, Any, Optional
 from tqdm import tqdm
-
 from utils.crawl_utils import cookies, headers, extract_total_data_from_html
 from repository.mongo_database import MongoDatabase
 
@@ -253,8 +252,8 @@ class GuService:
         return GuService.sanitize(articles)
 
     def get_articles(self, gu: str, dong: Optional[str], deposit_min: int, deposit_max: int, rent_min: int, rent_max: int, cursor: str):
-        if gu is None or deposit_min is None or deposit_max is None or rent_min is None or rent_max is None or cursor is None:
-            raise ValueError("gu, deposit_min, deposit_max, rent_min, and rent_max are required.")
+        if gu is None or deposit_min is None or rent_min is None or cursor is None:
+            raise ValueError("gu, deposit_min, rent_min, and cursor are required.")
         db = MongoDatabase()
         db.connect()
         articles = db.get_articles(gu=gu, dong=dong, deposit_min=deposit_min, deposit_max=deposit_max, rent_min=rent_min, rent_max=rent_max, cursor=cursor)
@@ -262,13 +261,6 @@ class GuService:
             article["_id"] = str(article["_id"])
         return GuService.sanitize(articles)
     
-    def save_estate(self, estate_id: Dict[str, Any]):
-        if not estate_id or "id" not in estate_id:
-            raise ValueError("Estate ID is required.")
-        db = MongoDatabase()
-        db.connect()
-        result = db.save_estate(estate_id["id"])
-        return {"status": "success" if result else "fail", "message": "Estate saved successfully." if result else "Failed to save estate."}
 
     def create_folder(self, user_id: str, folder_name: str):
         if not user_id:
@@ -287,3 +279,49 @@ class GuService:
         db.connect()
         folder_list = db.get_folder_list(user_id)
         return {"status": "success", "folders": folder_list} if folder_list else {"status": "fail", "message": "No folders found."}
+
+    def add_estate_to_folder(self, user_id: str, folder_name: str, estate_ids: list[str]):
+        if not user_id:
+            raise ValueError("User ID is required.")
+        if not folder_name:
+            raise ValueError("Folder name is required.")
+        if not estate_ids:
+            raise ValueError("Estate ids are required.")
+        db = MongoDatabase()
+        db.connect()
+        result = db.add_estate_to_folder(user_id, folder_name, estate_ids)
+        return {"status": "success" if result else "fail", "message": "Estate added to folder successfully." if result else "Failed to add estate to folder."}
+    
+    def get_estates_in_folder(self, user_id: str, folder_name: str):
+        if not user_id:
+            raise ValueError("User ID is required.")
+        if not folder_name:
+            raise ValueError("Folder name is required.")
+        db = MongoDatabase()
+        db.connect()
+        estates = db.get_estates_in_folder(user_id, folder_name)
+        for estate in estates:
+            estate["_id"] = str(estate["_id"])
+        return GuService.sanitize(estates)
+    
+    def remove_estate_from_folder(self, user_id: str, folder_name: str, estate_ids: list[str]):
+        if not user_id:
+            raise ValueError("User ID is required.")
+        if not folder_name:
+            raise ValueError("Folder name is required.")
+        if not estate_ids:
+            raise ValueError("Estate ids are required.")
+        db = MongoDatabase()
+        db.connect()
+        result = db.remove_estate_from_folder(user_id, folder_name, estate_ids)
+        return {"status": "success" if result else "fail", "message": "Estate removed from folder successfully." if result else "Failed to remove estate from folder."}
+    
+    def delete_folder(self, user_id: str, folder_name: str):
+        if not user_id:
+            raise ValueError("User ID is required.")
+        if not folder_name:
+            raise ValueError("Folder name is required.")
+        db = MongoDatabase()
+        db.connect()
+        result = db.delete_folder(user_id, folder_name)
+        return {"status": "success" if result else "fail", "message": "Folder deleted successfully." if result else "Failed to delete folder."}

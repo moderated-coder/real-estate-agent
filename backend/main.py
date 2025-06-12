@@ -57,11 +57,12 @@ async def get_articles(
     gu: str = Query(..., description="정렬 기준 (예: deposit_fee_asc)"),
     dong: Optional[str] = Query(None, description="동 이름 (선택 사항)"),
     deposit_min: int = Query(..., description="최소 보증금"),
-    deposit_max: int = Query(..., description="최대 보증금"),
+    deposit_max: int = Query(None, description="최대 보증금"),
     rent_min: int = Query(..., description="최소 월세"),
-    rent_max: int = Query(..., description="최대 월세"),
+    rent_max: int = Query(None, description="최대 월세"),
     cursor: str = Query(..., description="페이지 번호"),
 ):
+
     return gu_service.get_articles(
         gu=gu,
         dong=dong,
@@ -71,9 +72,6 @@ async def get_articles(
         rent_max=rent_max,
         cursor=cursor,
     )
-@app.post("/save/estate")
-async def save_estate(estate_id: Dict[str, Any] = Body(..., description="저장할 부동산 데이터 id")):
-    return gu_service.save_estate(estate_id)
 
 @app.post("/folder/create")
 async def create_folder(user_id: str = Body(..., description="사용자 ID"), folder_name: str = Body(..., description="생성할 폴더 이름")):
@@ -82,6 +80,26 @@ async def create_folder(user_id: str = Body(..., description="사용자 ID"), fo
 @app.get("/folder/list")
 async def get_folder_list(user_id: str = Query(..., description="사용자 ID")):
     return gu_service.get_folder_list(user_id)
+
+@app.post("/folder/add-estate")
+async def add_estate_to_folder(user_id: str = Body(..., description="사용자 ID"), folder_name: str = Body(..., description="폴더 이름"), estate_ids: list[str] = Body(..., description="부동산 ID")):
+    return gu_service.add_estate_to_folder(user_id, folder_name, estate_ids)
+
+@app.get("/folder/{user_id}/{folder_name}")
+async def get_estates_in_folder(user_id: str, folder_name: str):
+    return gu_service.get_estates_in_folder(user_id, folder_name)
+
+@app.post("/folder/remove-estate")
+async def remove_estate_from_folder(
+    user_id: str = Body(..., description="사용자 ID"),
+    folder_name: str = Body(..., description="폴더 이름"),
+    estate_id: str = Body(..., description="제거할 부동산 ID")
+):
+    return gu_service.remove_estate_from_folder(user_id, folder_name, estate_id)
+
+@app.delete("/folder/delete/{user_id}/{folder_name}")
+async def delete_folder(user_id: str, folder_name: str):
+    return gu_service.delete_folder(user_id, folder_name)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True)
