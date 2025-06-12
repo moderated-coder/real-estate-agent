@@ -11,7 +11,6 @@ export default function RQProviders({ children }: { children: ReactNode }) {
         // react-query 전역 설정
         queries: {
           refetchOnWindowFocus: false,
-          retryOnMount: true,
           refetchOnReconnect: false,
           retry: false,
         },
