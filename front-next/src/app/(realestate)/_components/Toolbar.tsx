@@ -49,7 +49,6 @@ const Toolbar = ({
       return { previousFolders };
     },
     onError: (_err, _newFolderName, context) => {
-      console.log("폴더생성에러");
       if (context?.previousFolders) {
         queryClient.setQueryData(["folders", "admin"], context.previousFolders);
       }

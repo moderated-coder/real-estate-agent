@@ -21,7 +21,10 @@ export default async function getRealEstateDatas({
   };
 }): Promise<RealEstateResponse> {
   const { gu, deposit_min, deposit_max, rent_min, rent_max, dong } = filters;
-  const url = new URL("get_articles", process.env.NEXT_PUBLIC_API_URL);
+
+  let apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/get_articles`;
+
+  const params = new URLSearchParams();
   const multiValueParams = {
     gu,
     dong,
@@ -32,18 +35,18 @@ export default async function getRealEstateDatas({
   };
 
   Object.entries(multiValueParams).forEach(([key, value]) => {
-    if (value === undefined) return;
-    url.searchParams.append(key, value);
+    if (value === undefined || value === null) return;
+    params.append(key, Array.isArray(value) ? value.join(",") : value);
   });
-
-  url.searchParams.append("cursor", pageParam.toString());
-
-  const response = await fetch(url.toString(), {
+  params.append("cursor", pageParam.toString());
+  apiUrl = `${apiUrl}?${params.toString()}`;
+  const res = await fetch(apiUrl, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
 
-  if (!response.ok) throw new Error("Failed to fetch real estate listings");
-  return await response.json();
+  if (!res.ok) throw new Error("Failed to fetch real estate listings");
+  const response = await res.json();
+  return response;
 }

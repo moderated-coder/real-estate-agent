@@ -1,5 +1,7 @@
 "use client";
 import { Article } from "@/src/app/(realestate)/types/realEstate";
+import { useRouter } from "next/navigation";
+import { formatMoney } from "@/src/app/(realestate)/_lib/formatMoney";
 import Image from "next/image";
 
 interface EstateItemCardProps {
@@ -12,7 +14,7 @@ export default function EstateItemCard({ realEstate, isSelected, onSelect }: Est
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSelect(realEstate._id, e.target.checked);
   };
-
+  const router = useRouter();
   return (
     <div>
       <div
@@ -35,7 +37,7 @@ export default function EstateItemCard({ realEstate, isSelected, onSelect }: Est
           <div>
             <div className="font-semibold">{realEstate.article_title}</div>
             <div className="text-sm text-gray-600">
-              보증금 {realEstate.deposit_fee} / 월세 {realEstate.rent_fee}
+              보증금 {formatMoney(realEstate.deposit_fee)} / 월세 {formatMoney(realEstate.rent_fee)}
             </div>
             {/* <div className="flex gap-2 text-xs mt-2">
               {realEstate.article_short_features === "None"
@@ -50,7 +52,12 @@ export default function EstateItemCard({ realEstate, isSelected, onSelect }: Est
             <div className="text-xs text-gray-500">{realEstate.dong}</div>
           </div>
         </div>
-        <div className="relative w-full h-48 bg-gray-100 rounded ml-4">
+        <div
+          className="relative w-full h-48 bg-gray-100 rounded ml-4"
+          onClick={() => {
+            window.open(`https://fin.land.naver.com/articles/${realEstate.article_no}`, "_blank");
+          }}
+        >
           {realEstate.image_url ? (
             <Image
               src={"https://landthumb-phinf.pstatic.net" + realEstate.image_url}

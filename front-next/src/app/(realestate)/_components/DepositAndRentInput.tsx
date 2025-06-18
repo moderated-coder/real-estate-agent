@@ -1,27 +1,12 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { formatMoney } from "../_lib/formatMoney";
 interface Props {
   depositRange: [number, number];
   setDepositRange: (range: [number, number]) => void;
   monthlyRentRange: [number, number];
   setMonthlyRentRange: (range: [number, number]) => void;
 }
-const formatMoney = (val: number) => {
-  if (val === Infinity) return "";
-  if (val === 0) return "0";
-
-  const billion = Math.floor(val / 10000);
-  const remainder = val % 10000;
-  const thousand = Math.floor(remainder / 1000);
-  const rest = remainder % 1000;
-
-  const parts = [];
-  if (billion > 0) parts.push(`${billion}억`);
-  if (thousand > 0) parts.push(`${thousand}천`);
-  if (rest > 0) parts.push(`${rest}만`);
-
-  return parts.join(" ");
-};
 
 const DepositAndRentInput = ({ depositRange, setDepositRange, monthlyRentRange, setMonthlyRentRange }: Props) => {
   const [toggle, setToggle] = useState({ minDeposit: false, maxDeposit: false, minRent: false, maxRent: false });
@@ -47,7 +32,7 @@ const DepositAndRentInput = ({ depositRange, setDepositRange, monthlyRentRange, 
   }, [monthlyRentRange]);
 
   return (
-    <section className="mx-auto px-4 py-4 bg-white rounded-b">
+    <section className="flex justify-end py-4 bg-white rounded-b">
       <div className="flex flex-col gap-6">
         <div>
           <div className="mb-1 font-semibold text-sm">보증금 (전세금)</div>

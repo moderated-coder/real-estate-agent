@@ -12,7 +12,7 @@ const FolderList = () => {
   });
 
   return (
-    <aside className="w-[220px] bg-white rounded-xl shadow-md p-5 h-fit">
+    <aside className="sticky top-20 w-[220px] bg-white rounded-xl shadow-md p-5 h-fit">
       <h3 className="text-lg font-semibold mb-3">리스트</h3>
       <ul className="space-y-1">
         {folders?.map((folder: string, idx: number) => (

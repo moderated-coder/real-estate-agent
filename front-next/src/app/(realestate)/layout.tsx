@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import NavBar from "./_components/NavBar";
 export default function RealEstateLayout({
   children,
@@ -6,7 +7,9 @@ export default function RealEstateLayout({
 }>) {
   return (
     <div>
-      <NavBar />
+      <Suspense fallback={<div>Loading...</div>}>
+        <NavBar />
+      </Suspense>
       {children}
     </div>
   );

@@ -13,12 +13,6 @@ const FolderPage = async ({ params }: { params: Promise<{ user: string; folderna
         </div>
 
         <SavedEstateList user={user} foldername={foldername} />
-        <div className="border-t pt-4 flex justify-between items-center">
-          <p className="text-sm">
-            선택한 매물 <strong>2개</strong>
-          </p>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded text-sm">엑셀로 내보내기</button>
-        </div>
       </div>
     </div>
   );
