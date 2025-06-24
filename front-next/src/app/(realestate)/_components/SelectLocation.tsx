@@ -31,14 +31,6 @@ const SelectLocation = ({ selectedDong, setSelectedDong, dongMap }: Props) => {
           ))}
         </ul>
       </section>
-      <div className="flex flex-wrap gap-2 mb-4">
-        {selectedDong.size > 0 &&
-          Array.from(selectedDong).map((dong) => (
-            <div key={dong} className="text-xs text-gray-600 mb-1 bg-gray-100 p-2 rounded">
-              {dong}
-            </div>
-          ))}
-      </div>
     </div>
   );
 };

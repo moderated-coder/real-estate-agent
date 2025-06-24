@@ -72,14 +72,16 @@ const DepositAndRentInput = ({ depositRange, setDepositRange, monthlyRentRange, 
                     const val = Number(e.target.value);
                     if (!isNaN(val)) setTempDepositMin(val > 230000 ? 230000 : val);
                   }}
-                  className="border rounded px-2 py-1 w-32 focus:outline-none"
+                  className="border rounded px-2 py-1 w-32 cursor-text bg-white
+             focus:ring focus:ring-blue-500 focus:ring-opacity-75 focus:outline-none transition-all duration-300 ease-in-out" // 수정된 부분
                   autoFocus
                 />
               ) : (
                 <input
                   type="text"
                   readOnly
-                  className="border rounded px-2 py-1 w-32 cursor-text bg-white focus:outline-none"
+                  className="border rounded px-2 py-1 w-32 cursor-text bg-white
+             focus:ring focus:ring-blue-500 focus:ring-opacity-75 focus:outline-none transition-all duration-300 ease-in-out" // 이 부분을 수정했습니다.
                   value={depositRange[0] === 0 ? "최소 보증금" : formatMoney(depositRange[0])}
                   onClick={() => {
                     setToggle((prev) => ({ ...prev, minDeposit: true }));
@@ -135,14 +137,14 @@ const DepositAndRentInput = ({ depositRange, setDepositRange, monthlyRentRange, 
                       setDepositRange([depositRange[0], Infinity]);
                     }
                   }}
-                  className="border rounded px-2 py-1 w-32 focus:outline-none"
+                  className="border rounded px-2 py-1 w-32 cursor-text bg-white focus:ring focus:ring-blue-500 focus:ring-opacity-75 focus:outline-none transition-all duration-300 ease-in-out"
                   autoFocus
                 />
               ) : (
                 <input
                   type="text"
                   readOnly
-                  className="border rounded px-2 py-1 w-32 cursor-text bg-white focus:outline-none"
+                  className="border rounded px-2 py-1 w-32 cursor-text bg-white focus:ring focus:ring-blue-500 focus:ring-opacity-75 focus:outline-none transition-all duration-300 ease-in-out"
                   value={depositRange[1] === Infinity ? "최대 보증금" : formatMoney(depositRange[1])}
                   onClick={() => {
                     setToggle((prev) => ({ ...prev, maxDeposit: true }));
@@ -205,14 +207,14 @@ const DepositAndRentInput = ({ depositRange, setDepositRange, monthlyRentRange, 
                     const val = Number(e.target.value);
                     if (!isNaN(val)) setTempMonthlyMin(val > 230000 ? 230000 : val);
                   }}
-                  className="border rounded px-2 py-1 w-32 focus:outline-none"
+                  className="border rounded px-2 py-1 w-32 cursor-text bg-white focus:ring focus:ring-blue-500 focus:ring-opacity-75 focus:outline-none transition-all duration-300 ease-in-out"
                   autoFocus
                 />
               ) : (
                 <input
                   type="text"
                   readOnly
-                  className="border rounded px-2 py-1 w-32 cursor-text bg-white focus:outline-none"
+                  className="border rounded px-2 py-1 w-32 cursor-text bg-white focus:ring focus:ring-blue-500 focus:ring-opacity-75 focus:outline-none transition-all duration-300 ease-in-out"
                   value={monthlyRentRange[0] === 0 ? "최소 월세" : formatMoney(monthlyRentRange[0])}
                   onClick={() => {
                     setToggle((prev) => ({ ...prev, minRent: true }));
@@ -268,14 +270,14 @@ const DepositAndRentInput = ({ depositRange, setDepositRange, monthlyRentRange, 
                       setMonthlyRentRange([monthlyRentRange[0], Infinity]);
                     }
                   }}
-                  className="border rounded px-2 py-1 w-32 focus:outline-none"
+                  className="border rounded px-2 py-1 w-32 cursor-text bg-white focus:ring focus:ring-blue-500 focus:ring-opacity-75 focus:outline-none transition-all duration-300 ease-in-out"
                   autoFocus
                 />
               ) : (
                 <input
                   type="text"
                   readOnly
-                  className="border rounded px-2 py-1 w-32 cursor-text bg-white focus:outline-none"
+                  className="border rounded px-2 py-1 w-32 cursor-text bg-white focus:ring focus:ring-blue-500 focus:ring-opacity-75 focus:outline-none transition-all duration-300 ease-in-out"
                   value={monthlyRentRange[1] === Infinity ? "최대 월세" : formatMoney(monthlyRentRange[1])}
                   onClick={() => {
                     setToggle((prev) => ({ ...prev, maxRent: true }));

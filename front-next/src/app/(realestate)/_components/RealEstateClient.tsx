@@ -14,6 +14,7 @@ export default function RealEstateClient({
   deposit_max,
   rent_min,
   rent_max,
+  article_class,
 }: {
   gu?: string;
   dong?: string;
@@ -21,12 +22,12 @@ export default function RealEstateClient({
   deposit_max?: string;
   rent_min?: string;
   rent_max?: string;
+  article_class?: string;
 }) {
   const [selectedEstateIds, setSelectedEstateIds] = useState<Set<string>>(new Set());
-
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = useInfiniteQuery({
-    queryKey: ["search", { gu, deposit_min, deposit_max, rent_min, rent_max, dong }] as const,
-    queryFn: ({ pageParam = "1", queryKey }) => {
+    queryKey: ["search", { gu, deposit_min, deposit_max, rent_min, rent_max, dong, article_class }] as const,
+    queryFn: ({ pageParam, queryKey }) => {
       const [, filters] = queryKey;
       return getRealEstateDatas({ pageParam, filters });
     },

@@ -18,9 +18,10 @@ export default async function getRealEstateDatas({
     deposit_max?: string;
     rent_min?: string;
     rent_max?: string;
+    article_class?: string;
   };
 }): Promise<RealEstateResponse> {
-  const { gu, deposit_min, deposit_max, rent_min, rent_max, dong } = filters;
+  const { gu, deposit_min, deposit_max, rent_min, rent_max, dong, article_class } = filters;
 
   let apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/get_articles`;
 
@@ -32,13 +33,14 @@ export default async function getRealEstateDatas({
     deposit_max,
     rent_min,
     rent_max,
+    article_class,
   };
 
   Object.entries(multiValueParams).forEach(([key, value]) => {
     if (value === undefined || value === null) return;
-    params.append(key, Array.isArray(value) ? value.join(",") : value);
+    params.set(key, Array.isArray(value) ? value.join(",") : value);
   });
-  params.append("cursor", pageParam.toString());
+  params.set("cursor", pageParam.toString());
   apiUrl = `${apiUrl}?${params.toString()}`;
   const res = await fetch(apiUrl, {
     method: "GET",

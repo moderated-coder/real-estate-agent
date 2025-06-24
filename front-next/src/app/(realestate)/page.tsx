@@ -1,6 +1,7 @@
 import RealEstateClient from "./_components/RealEstateClient";
 import { QueryClient, HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { getFolderList } from "@/src/lib/api";
+
 type SearchParams = {
   gu?: string;
   deposit_min?: string;
@@ -8,6 +9,7 @@ type SearchParams = {
   rent_min?: string;
   rent_max?: string;
   dong?: string;
+  article_class?: string;
 };
 export default async function RealEstatePage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const resolvedSearchParams = await searchParams;
@@ -17,13 +19,13 @@ export default async function RealEstatePage({ searchParams }: { searchParams: P
   const rent_min = resolvedSearchParams.rent_min ? resolvedSearchParams.rent_min : undefined;
   const rent_max = resolvedSearchParams.rent_max ? resolvedSearchParams.rent_max : undefined;
   const dong = resolvedSearchParams.dong ? resolvedSearchParams.dong : undefined;
+  const article_class = resolvedSearchParams.article_class ? resolvedSearchParams.article_class : "SELECT_ALL";
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
     queryKey: ["folders", "admin"],
     queryFn: getFolderList,
   });
   const dehydratedState = dehydrate(queryClient);
-
   return (
     <HydrationBoundary state={dehydratedState}>
       <div>
@@ -34,6 +36,7 @@ export default async function RealEstatePage({ searchParams }: { searchParams: P
           deposit_max={deposit_max}
           rent_min={rent_min}
           rent_max={rent_max}
+          article_class={article_class}
         />
       </div>
     </HydrationBoundary>
