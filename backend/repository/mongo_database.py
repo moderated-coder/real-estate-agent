@@ -169,9 +169,9 @@ class MongoDatabase:
             logger.error(f"Failed to fetch sample articles: {e}")
             return []
 
-    def get_articles(self,  gu: str, dong: Optional[str], deposit_min: int = None, deposit_max: int = None, rent_min: int = None, rent_max: int = None, cursor: str = None) -> List[Dict[str, Any]]:
-        if gu is None or deposit_min is None or rent_min is None or cursor is None:
-            raise ValueError("gu, deposit_min, rent_min, and cursor are required.")
+    def get_articles(self,  gu: str, dong: Optional[str], deposit_min: int = None, deposit_max: int = None, rent_min: int = None, rent_max: int = None, article_class: str = None, cursor: str = None) -> List[Dict[str, Any]]:
+        if gu is None or deposit_min is None or rent_min is None or cursor is None or article_class is None:
+            raise ValueError("gu, deposit_min, rent_min, cursor, and article_class are required.")
 
         base_filter = {
             "gu": {"$in": [gu]},
@@ -182,7 +182,12 @@ class MongoDatabase:
             base_filter["deposit_fee"]["$lte"] = deposit_max
         if rent_max is not None:
             base_filter["rent_fee"] = {"$gte": rent_min, "$lte": rent_max}
-
+        if article_class == "SELECT_VILLA":
+            base_filter["article_class"] = {"$in": ["빌라"]}
+        elif article_class == "SELECT_OFFICE":
+            base_filter["article_class"] = {"$in": ["오피스텔"]}
+        elif article_class == "SELECT_ONE_ROOM":
+            base_filter["article_class"] = {"$in": ["원룸"]}
         if dong:
             base_filter["dong"] = {"$in": dong.split(",")}
 

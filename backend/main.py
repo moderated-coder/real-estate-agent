@@ -60,9 +60,10 @@ async def get_articles(
     deposit_max: int = Query(None, description="최대 보증금"),
     rent_min: int = Query(..., description="최소 월세"),
     rent_max: int = Query(None, description="최대 월세"),
+    article_class: str = Query(..., description="매물 종류"),
     cursor: str = Query(..., description="페이지 번호"),
-):
 
+):
     return gu_service.get_articles(
         gu=gu,
         dong=dong,
@@ -70,6 +71,7 @@ async def get_articles(
         deposit_max=deposit_max,
         rent_min=rent_min,
         rent_max=rent_max,
+        article_class=article_class,
         cursor=cursor,
     )
 
